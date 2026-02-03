@@ -1,0 +1,1 @@
+console.log("SpeedTyper System gestartet! JavaScript ist verbunden.");

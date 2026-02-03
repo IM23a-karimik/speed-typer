@@ -1,0 +1,7 @@
+body {
+    background-color: #222; /* Dunkler Hintergrund */
+    color: #eee;            /* Heller Text */
+    font-family: 'Courier New', Courier, monospace; /* Schreibmaschinen-Look */
+    text-align: center;
+    margin-top: 50px;
+}
