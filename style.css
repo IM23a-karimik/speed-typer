@@ -1,7 +1,99 @@
+/* Grundlegendes Seiten-Layout */
 body {
-    background-color: #222; /* Dunkler Hintergrund */
-    color: #eee;            /* Heller Text */
-    font-family: 'Courier New', Courier, monospace; /* Schreibmaschinen-Look */
+    background-color: #222;
+    color: #eee;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Nimmt die volle Bildschirmhöhe ein */
+    margin: 0;
+}
+
+/* Die Haupt-Box in der Mitte */
+.game-container {
+    background-color: #333;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    max-width: 800px;
+    width: 90%;
     text-align: center;
-    margin-top: 50px;
+}
+
+h1 {
+    margin-top: 0;
+    color: #4CAF50; /* Ein schönes Grün */
+}
+
+/* Timer und WPM nebeneinander */
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Der Bereich, in dem der Text steht */
+.quote-container {
+    position: relative;
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+/* Ein Trick: Wir legen das Eingabefeld unsichtbar genau über den Text.
+   So kann der Nutzer tippen (und die Handy-Tastatur würde aufgehen),
+   aber er sieht nur den formatierten Text darunter. */
+#quote-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Macht das Feld unsichtbar */
+    z-index: 10;
+    cursor: text;
+    resize: none;
+}
+
+#restart-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-family: inherit;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#restart-btn:hover {
+    background-color: #45a049;
+}
+
+
+/* =========================================
+   FEEDBACK-KLASSEN FÜR DAS JAVASCRIPT
+   Diese Klassen weisen wir später den
+   einzelnen Buchstaben per Code zu.
+   ========================================= */
+
+.correct {
+    color: #4CAF50; /* Grün für richtig */
+}
+
+.incorrect {
+    color: #f44336; /* Rot für falsch */
+    text-decoration: underline;
+}
+
+.active {
+    background-color: #555; /* Grauer Hintergrund als "Cursor" */
+    border-radius: 3px;
 }
