@@ -8,9 +8,18 @@ const quotes = [
     "Ein guter Entwickler liest mehr Code als er schreibt."
 ];
 
-// 2. HTML-Elemente aus dem DOM holen
+// 2. HTML-Elemente holen
 const quoteDisplayElement = document.getElementById('quote-display');
 const quoteInputElement = document.getElementById('quote-input');
+const timerElement = document.getElementById('timer');
+const wpmElement = document.getElementById('wpm');
+const restartBtn = document.getElementById('restart-btn');
+
+// --- NEU: Variablen für das Spiel ---
+let timeLeft = 10;
+let timerInterval = null;
+let isStarted = false;
+let completedKeystrokes = 0; // Speichert die Anschläge von bereits fertigen Sätzen
 
 // 3. Funktion: Neuen Text anzeigen
 function renderNewQuote() {
@@ -26,60 +35,89 @@ function renderNewQuote() {
         quoteDisplayElement.appendChild(characterSpan);
     });
 
-    // WICHTIG: Setzt den "Cursor" (grauer Hintergrund) auf den allerersten Buchstaben
     if (quoteDisplayElement.firstChild) {
         quoteDisplayElement.firstChild.classList.add('active');
     }
 }
 
-// ==========================================
-// NEU: ISSUE 5 - DIE TIPP-LOGIK
-// ==========================================
+// --- NEU: Timer starten ---
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerElement.innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval); // Stoppt die Uhr
+            endGame();
+        }
+    }, 1000);
+}
+
+// --- NEU: Spiel beenden und WPM berechnen ---
+function endGame() {
+    quoteInputElement.disabled = true; // Sperrt das Eingabefeld
+
+    // Wir zählen alle Tasten von fertigen Sätzen + die richtigen Tasten vom aktuellen Satz
+    const correctInCurrentQuote = quoteDisplayElement.querySelectorAll('.correct').length;
+    const totalCorrect = completedKeystrokes + correctInCurrentQuote;
+
+    // Standard-Formel für WPM: (Alle richtigen Tasten / 5) / Zeit in Minuten
+    // Da unser Spiel genau 1 Minute geht, teilen wir einfach nur durch 5.
+    const wpm = Math.round(totalCorrect / 5);
+    wpmElement.innerText = wpm;
+
+    // Nachricht an den Spieler
+    quoteDisplayElement.innerHTML = `<span style="color: #4CAF50;">Zeit abgelaufen! Deine WPM: ${wpm}</span>`;
+}
+
+// --- NEU: Neustart-Button Logik ---
+restartBtn.addEventListener('click', () => {
+    clearInterval(timerInterval);
+    timeLeft = 10;
+    timerElement.innerText = timeLeft;
+    wpmElement.innerText = "0";
+    isStarted = false;
+    completedKeystrokes = 0;
+    quoteInputElement.disabled = false; // Eingabefeld wieder freigeben
+    quoteInputElement.focus(); // Cursor direkt wieder reinsetzen
+    renderNewQuote();
+});
+
+// 4. Die Tipp-Logik
 quoteInputElement.addEventListener('input', () => {
-    // Alle <span> Elemente (Buchstaben) im Display-Feld als Array holen
+    // Wenn das Spiel noch nicht läuft, starte den Timer beim ersten Tastendruck!
+    if (!isStarted) {
+        isStarted = true;
+        startTimer();
+    }
+
     const arrayQuote = quoteDisplayElement.querySelectorAll('span');
-
-    // Den aktuell vom Nutzer getippten Text in einzelne Buchstaben zerlegen
     const arrayValue = quoteInputElement.value.split('');
+    let allCorrect = true;
 
-    let allCorrect = true; // Hilfsvariable für den Wechsel zum nächsten Satz
-
-    // Jeden Buchstaben des Originalsatzes mit der Eingabe vergleichen
     arrayQuote.forEach((characterSpan, index) => {
         const character = arrayValue[index];
 
-        // Fall 1: Nutzer hat diesen Buchstaben noch gar nicht getippt
         if (character == null) {
-            characterSpan.classList.remove('correct');
-            characterSpan.classList.remove('incorrect');
-            characterSpan.classList.remove('active');
+            characterSpan.classList.remove('correct', 'incorrect', 'active');
             allCorrect = false;
-
-            // Der erste noch nicht getippte Buchstabe bekommt die "active" Klasse (unser Cursor)
-            if (arrayValue.length === index) {
-                characterSpan.classList.add('active');
-            }
-
-        // Fall 2: Der getippte Buchstabe ist RICHTIG
+            if (arrayValue.length === index) characterSpan.classList.add('active');
         } else if (character === characterSpan.innerText) {
             characterSpan.classList.add('correct');
-            characterSpan.classList.remove('incorrect');
-            characterSpan.classList.remove('active');
-
-        // Fall 3: Der getippte Buchstabe ist FALSCH
+            characterSpan.classList.remove('incorrect', 'active');
         } else {
-            characterSpan.classList.remove('correct');
+            characterSpan.classList.remove('correct', 'active');
             characterSpan.classList.add('incorrect');
-            characterSpan.classList.remove('active');
             allCorrect = false;
         }
     });
 
-    // Wenn der Satz komplett und fehlerfrei abgetippt wurde, lade sofort den nächsten!
     if (allCorrect) {
+        // Satz ist fertig! Wir merken uns die Anzahl der Tasten für die WPM-Berechnung
+        completedKeystrokes += arrayQuote.length;
         renderNewQuote();
     }
 });
 
-// 4. Das Spiel direkt beim Laden der Seite einmal starten
+// Spiel initialisieren
 renderNewQuote();
