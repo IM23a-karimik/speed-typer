@@ -20,7 +20,8 @@
         "lint-check": "eslint .",
         "lint-fix": "eslint --fix .",
         "test": "vitest",
-        "test-coverage": "vitest run --coverage"
+        "test-coverage": "vitest run --coverage",
+        "e2e-headless": "testcafe chrome:headless philosophy.test.js"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -28,6 +29,7 @@
         "eslint": "^10.2.0",
         "globals": "^17.4.0",
         "prettier": "^3.8.1",
+        "testcafe": "^3.7.4",
         "vitest": "^4.1.2"
     },
     "dependencies": {
