@@ -1,5 +1,5 @@
-import {describe, it, expect} from 'vitest';
-import {calculateWpm} from './logic.js';
+import { describe, it, expect } from 'vitest';
+import { calculateWpm } from './logic.js';
 
 describe('WPM Calculator', () => {
   // --- ERSTER TEST (LU05.A01) ---
@@ -20,7 +20,7 @@ describe('WPM Calculator', () => {
   it('sollte 0 WPM zurückgeben, wenn die Zeit 0 ist (Edge Case)', () => {
     // Arrange
     const correctKeystrokes = 100; // Selbst wenn Tasten gedrückt wurden...
-    const timeInMinutes = 0;       // ...aber keine Zeit vergangen ist.
+    const timeInMinutes = 0; // ...aber keine Zeit vergangen ist.
 
     // Act
     const result = calculateWpm(correctKeystrokes, timeInMinutes);
