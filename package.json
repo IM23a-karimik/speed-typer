@@ -1,28 +1,33 @@
 {
-  "name": "speed-typer",
-  "version": "1.0.0",
-  "description": "",
-  "homepage": "https://github.com/IM23a-karimik/speed-typer#readme",
-  "bugs": {
-    "url": "https://github.com/IM23a-karimik/speed-typer/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/IM23a-karimik/speed-typer.git"
-  },
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "script.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.0.3",
-    "globals": "^17.4.0"
-  },
-  "dependencies": {
-    "eslint-config-prettier": "^10.1.8"
-  }
+    "name": "speed-typer",
+    "version": "1.0.0",
+    "description": "",
+    "homepage": "https://github.com/IM23a-karimik/speed-typer#readme",
+    "bugs": {
+        "url": "https://github.com/IM23a-karimik/speed-typer/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/IM23a-karimik/speed-typer.git"
+    },
+    "license": "ISC",
+    "author": "",
+    "type": "module",
+    "main": "script.js",
+    "scripts": {
+        "format-check": "prettier --check .",
+        "format-fix": "prettier --write .",
+        "lint-check": "eslint .",
+        "lint-fix": "eslint --fix ."
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.2.0",
+        "globals": "^17.4.0",
+        "prettier": "^3.8.1"
+    },
+    "dependencies": {
+        "eslint-config-prettier": "^10.1.8"
+    },
+    "keywords": []
 }

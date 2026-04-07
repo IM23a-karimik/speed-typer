@@ -1,7 +1,4 @@
-# top-most EditorConfig file
-root = true
-
-# Global settings (applied to all files unless overridden)
+# Global settings
 [*]
 charset = utf-8
 end_of_line = lf
@@ -10,10 +7,6 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
-# Python files
-[*.py]
-indent_size = 4
-
 # JavaScript/TypeScript files
 [*.{js,ts,jsx,tsx,cjs,mjs}]
 indent_size = 2
@@ -21,11 +14,3 @@ indent_size = 2
 # HTML/CSS
 [*.{html,css,scss}]
 indent_size = 2
-
-# JSON / YAML / config
-[*.{json,yml,yaml}]
-indent_size = 2
-
-# Markdown files
-[*.md]
-trim_trailing_whitespace = false # don't trim trailing whitespace (for line breaks)

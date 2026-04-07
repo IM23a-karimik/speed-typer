@@ -1,29 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SpeedTyper</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="game-container">
-        <h1>SpeedTyper</h1>
+      <h1>SpeedTyper</h1>
 
-        <div class="stats-container">
-            <div class="stat-box">Zeit: <span id="timer">10</span>s</div>
-            <div class="stat-box">WPM: <span id="wpm">0</span></div>
-        </div>
+      <div class="stats-container">
+        <div class="stat-box">Zeit: <span id="timer">10</span>s</div>
+        <div class="stat-box">WPM: <span id="wpm">0</span></div>
+      </div>
 
-        <div class="quote-container">
-            <div id="quote-display">Hier erscheint gleich dein Text zum Abtippen...</div>
+      <div class="quote-container">
+        <div id="quote-display">Hier erscheint gleich dein Text zum Abtippen...</div>
 
-            <textarea id="quote-input" autofocus placeholder="Klicke hier und beginne zu tippen..."></textarea>
-        </div>
+        <textarea
+          id="quote-input"
+          autofocus
+          placeholder="Klicke hier und beginne zu tippen..."
+        ></textarea>
+      </div>
 
-        <button id="restart-btn">Neustart</button>
+      <button id="restart-btn">Neustart</button>
     </div>
 
     <script src="script.js" defer></script>
-</body>
+  </body>
 </html>
