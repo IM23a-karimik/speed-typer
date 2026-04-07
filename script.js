@@ -1,3 +1,5 @@
+import { calculateWpm } from './logic.js';
+
 // 1. Array mit verschiedenen Texten/Sätzen
 const quotes = [
   'Das ist ein einfacher Text zum Üben.',
@@ -63,7 +65,7 @@ function endGame() {
 
   // Standard-Formel für WPM: (Alle richtigen Tasten / 5) / Zeit in Minuten
   // Da unser Spiel genau 1 Minute geht, teilen wir einfach nur durch 5.
-  const wpm = Math.round(totalCorrect / 5);
+  const wpm = calculateWpm(totalCorrect, 1);
   wpmElement.innerText = wpm;
 
   // Nachricht an den Spieler
