@@ -26,10 +26,8 @@ jobs:
             - name: Wait until Ready
               run: echo "Frontend is ready for E2E testing..."
 
-            # Dieser Schritt installiert Chrome sauber auf dem GitHub-Server
             - name: Setup Chrome
               uses: browser-actions/setup-chrome@latest
 
-            # Das --no-sandbox Flag verhindert Server-Abstürze
             - name: Run E2e-Tests
               run: npx testcafe "chrome:headless --no-sandbox" philosophy.e2e.js

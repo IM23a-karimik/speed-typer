@@ -1,17 +1,6 @@
 {
     "name": "speed-typer",
     "version": "1.0.0",
-    "description": "",
-    "homepage": "https://github.com/IM23a-karimik/speed-typer#readme",
-    "bugs": {
-        "url": "https://github.com/IM23a-karimik/speed-typer/issues"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/IM23a-karimik/speed-typer.git"
-    },
-    "license": "ISC",
-    "author": "",
     "type": "module",
     "main": "script.js",
     "scripts": {
@@ -19,7 +8,7 @@
         "format-fix": "prettier --write .",
         "lint-check": "eslint .",
         "lint-fix": "eslint --fix .",
-        "test": "vitest",
+        "test": "vitest run",
         "test-coverage": "vitest run --coverage",
         "e2e-headless": "testcafe chrome:headless philosophy.e2e.js"
     },
@@ -29,11 +18,10 @@
         "eslint": "^10.2.0",
         "globals": "^17.4.0",
         "prettier": "^3.8.1",
-        "testcafe": "^0.0.16",
+        "testcafe": "^3.6.2",
         "vitest": "^4.1.2"
     },
     "dependencies": {
         "eslint-config-prettier": "^10.1.8"
-    },
-    "keywords": []
+    }
 }
