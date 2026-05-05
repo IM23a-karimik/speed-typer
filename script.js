@@ -75,7 +75,7 @@ function endGame() {
   wpmElement.innerText = wpm;
 
   // Schöne End-Nachricht direkt im Text-Band anzeigen
-  textTrack.style.transform = `translateX(0px)`; // Wieder in die Mitte schieben
+  textTrack.style.transform = 'translateX(0px)'; // Wieder in die Mitte schieben
   textTrack.innerHTML = `<span style="color: #4CAF50; font-family: sans-serif;">Zeit abgelaufen! Deine WPM: ${wpm}</span>`;
 }
 
