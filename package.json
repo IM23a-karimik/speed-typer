@@ -21,7 +21,7 @@
         "lint-fix": "eslint --fix .",
         "test": "vitest",
         "test-coverage": "vitest run --coverage",
-        "e2e-headless": "testcafe chrome:headless philosophy.test.js"
+        "e2e-headless": "testcafe chrome:headless philosophy.e2e.js"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
