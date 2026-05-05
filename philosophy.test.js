@@ -60,7 +60,7 @@ const getFirstValidLink = async (t) => {
         !node.closest('sup') &&
         !node.closest('.infobox') &&
         !node.closest('.sidebar') && // <-- NEU: Sidebars komplett ignorieren
-        !node.closest('.navbox') &&  // <-- NEU: Navigationsboxen ignorieren
+        !node.closest('.navbox') && // <-- NEU: Navigationsboxen ignorieren
         node.getAttribute('href') &&
         node.getAttribute('href').startsWith('/wiki/')
       );
