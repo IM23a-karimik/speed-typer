@@ -1,126 +1,296 @@
 import { calculateWpm } from './logic.js';
 
-const quotes = [
-  'Das ist ein einfacher Text zum Ueben. ',
-  'Programmieren macht Spass, wenn es funktioniert. ',
-  'Jeder Fehler ist eine neue Gelegenheit zu lernen. ',
-  'Schnelles Tippen spart dir auf Dauer sehr viel Zeit. ',
-  'JavaScript ist die Sprache des Internets. ',
-  'Ein guter Entwickler liest mehr Code als er schreibt. ',
+const wordsPool = [
+  'der',
+  'die',
+  'das',
+  'und',
+  'in',
+  'zu',
+  'den',
+  'nicht',
+  'von',
+  'sie',
+  'ist',
+  'des',
+  'sich',
+  'mit',
+  'dem',
+  'dass',
+  'er',
+  'es',
+  'ein',
+  'ich',
+  'auf',
+  'so',
+  'eine',
+  'auch',
+  'als',
+  'an',
+  'nach',
+  'wie',
+  'im',
+  'man',
+  'aber',
+  'aus',
+  'durch',
+  'wenn',
+  'nur',
+  'war',
+  'noch',
+  'werden',
+  'bei',
+  'hat',
+  'wir',
+  'was',
+  'wird',
+  'sein',
+  'einen',
+  'welche',
+  'sind',
+  'oder',
+  'zur',
+  'um',
+  'haben',
+  'einer',
+  'mir',
+  'ueber',
+  'ihm',
+  'diese',
+  'einem',
+  'ihr',
+  'eines',
+  'da',
+  'zum',
+  'kann',
+  'doch',
+  'vor',
+  'mich',
+  'ihn',
+  'du',
+  'hatte',
+  'seine',
+  'mehr',
+  'am',
+  'denn',
+  'nun',
+  'unter',
+  'sehr',
+  'selbst',
+  'schon',
+  'hier',
+  'bis',
+  'habe',
+  'ihre',
+  'dann',
+  'ihnen',
+  'seiner',
+  'alle',
+  'wieder',
+  'meine',
+  'zeit',
+  'gegen',
+  'vom',
+  'ganz',
+  'wo',
+  'muss',
+  'ohne',
+  'koennen',
+  'sei',
+  'ja',
+  'wurde',
+  'jetzt',
+  'immer',
+  'seinen',
+  'wohl',
+  'dieses',
+  'ihren',
+  'wuerde',
+  'diesen',
+  'sondern',
+  'weil',
+  'welcher',
+  'nichts',
+  'diesem',
+  'alles',
+  'waren',
+  'will',
+  'herr',
+  'viel',
+  'mein',
+  'also',
+  'soll',
+  'worden',
+  'lassen',
+  'dies',
+  'machen',
+  'ihrer',
 ];
 
-const textTrack = document.getElementById('text-track');
-const typingWindow = document.getElementById('typing-window');
-const timerElement = document.getElementById('timer');
-const wpmElement = document.getElementById('wpm');
+const typingArea = document.getElementById('typing-area');
+const timeDisplay = document.getElementById('time-display');
 const restartBtn = document.getElementById('restart-btn');
-const timeOptions = document.querySelectorAll('.time-opt');
+const modeBtns = document.querySelectorAll('.mode-btn');
+const valBtns = document.querySelectorAll('.val-btn');
+const timeValues = document.getElementById('time-values');
+const wordValues = document.getElementById('word-values');
 
-let selectedTime = 60; // Standardzeit
-let timeLeft = selectedTime;
+let currentMode = 'time';
+let currentValue = 30;
 let timerInterval = null;
 let isStarted = false;
 let currentIndex = 0;
+let charElements = [];
+let startTime = null;
 
-// --- ZEIT-AUSWAHL LOGIK ---
-timeOptions.forEach((option) => {
-  option.addEventListener('click', (e) => {
-    // Aktive Klasse verschieben
-    timeOptions.forEach((opt) => opt.classList.remove('active'));
+// Menü: Zeit oder Wörter auswählen
+modeBtns.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    modeBtns.forEach((b) => b.classList.remove('active'));
     e.target.classList.add('active');
+    currentMode = e.target.dataset.mode;
 
-    // Neue Zeit übernehmen und Spiel resetten
-    selectedTime = parseInt(e.target.getAttribute('data-time'), 10);
-    resetGame();
+    if (currentMode === 'time') {
+      timeValues.classList.remove('hidden');
+      wordValues.classList.add('hidden');
+      currentValue = parseInt(
+        document.querySelector('#time-values .val-btn.active').dataset.val,
+        10,
+      );
+    } else {
+      timeValues.classList.add('hidden');
+      wordValues.classList.remove('hidden');
+      currentValue = parseInt(
+        document.querySelector('#word-values .val-btn.active').dataset.val,
+        10,
+      );
+    }
+    initGame();
   });
 });
 
-function generateLongText() {
-  let longArray = [];
-  for (let i = 0; i < 10; i++) {
-    longArray = longArray.concat([...quotes].sort(() => Math.random() - 0.5));
+// Menü: Zahlen auswählen (15, 30, 60 bzw. 10, 25, 50)
+valBtns.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    const parent = e.target.parentElement;
+    parent.querySelectorAll('.val-btn').forEach((b) => b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentValue = parseInt(e.target.dataset.val, 10);
+    initGame();
+  });
+});
+
+function generateText() {
+  let wordCount = currentMode === 'time' ? 200 : currentValue;
+  let textArray = [];
+  for (let i = 0; i < wordCount; i++) {
+    textArray.push(wordsPool[Math.floor(Math.random() * wordsPool.length)]);
   }
-  return longArray.join('');
+  return textArray;
 }
 
 function initGame() {
-  textTrack.innerHTML = '';
+  typingArea.innerHTML = '';
+  charElements = [];
   currentIndex = 0;
-  const text = generateLongText();
+  isStarted = false;
+  clearInterval(timerInterval);
 
-  text.split('').forEach((character, index) => {
-    const span = document.createElement('span');
-    span.innerText = character;
-    span.classList.add('char');
-    if (index === 0) span.classList.add('active');
-    textTrack.appendChild(span);
+  if (currentMode === 'time') {
+    timeDisplay.innerText = currentValue;
+  } else {
+    timeDisplay.innerText = `${currentValue} W.`;
+  }
+
+  const words = generateText();
+
+  words.forEach((word, wordIdx) => {
+    const wordDiv = document.createElement('div');
+    wordDiv.className = 'word';
+
+    word.split('').forEach((char) => {
+      const span = document.createElement('span');
+      span.innerText = char;
+      span.className = 'char';
+      wordDiv.appendChild(span);
+      charElements.push(span);
+    });
+
+    // Leerzeichen am Ende des Wortes (außer beim allerletzten Wort)
+    if (wordIdx < words.length - 1) {
+      const spaceSpan = document.createElement('span');
+      spaceSpan.innerText = ' ';
+      spaceSpan.className = 'char space';
+      wordDiv.appendChild(spaceSpan);
+      charElements.push(spaceSpan);
+    }
+
+    typingArea.appendChild(wordDiv);
   });
 
-  updateScrollPosition();
+  if (charElements.length > 0) {
+    charElements[0].classList.add('active');
+  }
 }
 
-function startTimer() {
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    timerElement.innerText = timeLeft;
+function startGame() {
+  isStarted = true;
+  startTime = Date.now();
 
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      endGame();
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+    if (currentMode === 'time') {
+      const left = currentValue - elapsed;
+      timeDisplay.innerText = left;
+      if (left <= 0) endGame();
+    } else {
+      timeDisplay.innerText = `${elapsed}s`; // Im Wort-Modus die Stoppuhr hochzählen
     }
   }, 1000);
 }
 
 function endGame() {
-  const totalCorrect = textTrack.querySelectorAll('.correct').length;
-  // WPM Formel anpassen: Wie viel Anteil einer Minute war eingestellt?
-  const minutesPassed = selectedTime / 60;
-  const wpm = calculateWpm(totalCorrect, minutesPassed);
-
-  wpmElement.innerText = wpm;
-
-  textTrack.style.transform = 'translateX(0px)';
-  textTrack.innerHTML = `<span style="color: var(--accent); font-family: 'Inter', sans-serif;">Zeit abgelaufen! Deine WPM: ${wpm}</span>`;
-}
-
-// Ausgelagerte Reset-Funktion, da sie nun vom Button UND den Zeit-Optionen gebraucht wird
-function resetGame() {
   clearInterval(timerInterval);
-  timeLeft = selectedTime;
-  timerElement.innerText = timeLeft;
-  wpmElement.innerText = '0';
+  const totalCorrect = document.querySelectorAll('.char.correct').length;
+  const elapsedMinutes = (Date.now() - startTime) / 60000;
+  const wpm = calculateWpm(totalCorrect, elapsedMinutes);
+
+  typingArea.innerHTML = '';
+  timeDisplay.innerText = `WPM: ${wpm}`;
   isStarted = false;
-  initGame();
 }
 
-restartBtn.addEventListener('click', resetGame);
+restartBtn.addEventListener('click', initGame);
 
 document.addEventListener('keydown', (e) => {
-  if (timeLeft <= 0) return;
+  // Ignoriere alles, was keine Taste zum Tippen ist
+  if (e.key.length !== 1 && e.key !== 'Backspace') return;
 
-  const spans = document.querySelectorAll('.char');
-  if (currentIndex >= spans.length) return;
+  // Verhindert, dass die Leertaste die Website nach unten scrollt
+  if (e.key === ' ') e.preventDefault();
 
+  if (currentIndex >= charElements.length) return;
+
+  // Backspace (Löschen)
   if (e.key === 'Backspace' && currentIndex > 0) {
-    spans[currentIndex].classList.remove('active');
+    charElements[currentIndex].classList.remove('active');
     currentIndex--;
-    spans[currentIndex].classList.remove('correct', 'incorrect');
-    spans[currentIndex].classList.add('active');
-    updateScrollPosition();
+    charElements[currentIndex].classList.remove('correct', 'incorrect');
+    charElements[currentIndex].classList.add('active');
+
+    // Kamera fährt sanft zurück nach oben, falls nötig
+    charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
   if (e.key.length !== 1) return;
 
-  if (!isStarted) {
-    isStarted = true;
-    startTimer();
-  }
+  if (!isStarted) startGame();
 
-  const currentSpan = spans[currentIndex];
-  const typedChar = e.key;
+  const currentSpan = charElements[currentIndex];
 
-  if (typedChar === currentSpan.innerText) {
+  if (e.key === currentSpan.innerText) {
     currentSpan.classList.add('correct');
   } else {
     currentSpan.classList.add('incorrect');
@@ -129,23 +299,14 @@ document.addEventListener('keydown', (e) => {
   currentSpan.classList.remove('active');
   currentIndex++;
 
-  if (currentIndex < spans.length) {
-    spans[currentIndex].classList.add('active');
+  if (currentIndex < charElements.length) {
+    charElements[currentIndex].classList.add('active');
+    // Die Kamera fährt sanft nach unten, wenn du in eine neue Zeile tippst!
+    charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else if (currentMode === 'words') {
+    endGame(); // Spiel sofort beenden, wenn das letzte Wort getippt wurde
   }
-
-  updateScrollPosition();
 });
 
-function updateScrollPosition() {
-  const spans = document.querySelectorAll('.char');
-  if (currentIndex >= spans.length) return;
-
-  const currentSpan = spans[currentIndex];
-  const containerHalfWidth = typingWindow.offsetWidth / 2;
-  const offsetLeft = currentSpan.offsetLeft;
-
-  const centerPosition = containerHalfWidth - offsetLeft;
-  textTrack.style.transform = `translateX(${centerPosition}px)`;
-}
-
+// Spiel beim Start initialisieren
 initGame();

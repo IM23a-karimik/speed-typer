@@ -1,11 +1,10 @@
-/* --- GLOBALE EINSTELLUNGEN --- */
 :root {
-  --bg-color: #323437; /* Dunkelgrauer Hintergrund */
-  --text-main: #d1d0c5; /* Helles Beige für normalen Text */
-  --text-muted: #646669; /* Dunkleres Grau für ungetippten Text */
-  --accent: #e2b714; /* Gold-Gelb für aktive Elemente (wie Monkeytype) */
-  --correct: #d1d0c5; /* Getippte Buchstaben werden hell */
-  --incorrect: #ca4754; /* Rot für Fehler */
+  --bg: #323437;
+  --main: #e2b714;
+  --caret: #e2b714;
+  --sub: #646669;
+  --text: #d1d0c5;
+  --error: #ca4754;
 }
 
 * {
@@ -15,137 +14,130 @@
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Roboto Mono', monospace;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 .game-container {
   width: 100%;
-  max-width: 900px;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+  max-width: 1000px;
+  padding: 2rem;
 }
 
-/* --- HEADER & ZEIT-OPTIONEN --- */
-.top-bar {
+header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 3rem;
 }
 
-h1 {
-  font-size: 24px;
-  color: var(--text-muted);
+.logo {
+  font-size: 1.8rem;
+  color: var(--text);
+  font-weight: bold;
 }
 
-.time-options {
+.menu {
   display: flex;
-  gap: 15px;
+  gap: 2rem;
   background: rgba(0, 0, 0, 0.2);
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
 }
 
-.time-opt {
+.mode-selector,
+.value-selector {
+  display: flex;
+  gap: 1rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+button {
   background: none;
   border: none;
-  color: var(--text-muted);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
+  color: var(--sub);
+  font-family: inherit;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: color 0.2s;
 }
 
-.time-opt:hover {
-  color: var(--text-main);
+button:hover {
+  color: var(--text);
+}
+button.active {
+  color: var(--main);
 }
 
-.time-opt.active {
-  color: var(--accent);
-  font-weight: bold;
+.stat {
+  font-size: 2.5rem;
+  color: var(--main);
+  margin-bottom: 1rem;
+  height: 3rem;
 }
 
-/* --- STATS --- */
-.stats-container {
+/* Der Textblock: Zeigt ca. 3 Zeilen an, der Rest ist unsichtbar */
+#typing-area {
+  font-size: 1.8rem;
+  line-height: 1.6;
   display: flex;
-  gap: 40px;
-  font-size: 24px;
-  color: var(--accent);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-/* --- TIPP-FENSTER --- */
-.quote-container {
-  position: relative;
-  width: 100%;
-}
-
-.typing-window {
-  width: 100%;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  height: 135px;
   overflow: hidden;
-  white-space: nowrap;
-  padding: 20px 0;
-  /* Macht den Rand links und rechts unscharf, damit der Text cool "verschwindet" */
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  position: relative;
 }
 
-.text-track {
-  display: inline-block;
-  transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
-  transform: translateX(50%);
+/* Verhindert, dass Wörter in der Mitte durchbrochen werden */
+.word {
+  display: flex;
+  margin-bottom: 0.5rem;
 }
 
 .char {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 36px;
-  color: var(--text-muted);
-  transition: color 0.1s;
+  color: var(--sub);
+  position: relative;
 }
 
 .char.correct {
-  color: var(--correct);
+  color: var(--text);
 }
-
 .char.incorrect {
-  color: var(--incorrect);
-  border-bottom: 2px solid var(--incorrect);
+  color: var(--error);
+  border-bottom: 2px solid var(--error);
 }
 
-/* Der Cursor */
-.char.active {
-  border-left: 3px solid var(--accent);
-  margin-left: -3px; /* Verhindert, dass der Text wackelt */
-  color: var(--text-main);
+/* Der blinkende Cursor am aktuellen Buchstaben */
+.char.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 3px;
+  background-color: var(--caret);
+  animation: blink 1s infinite;
 }
 
-/* --- CONTROLS --- */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
 .controls {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 18px;
-  cursor: pointer;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.icon-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
+  margin-top: 3rem;
+  text-align: center;
 }
