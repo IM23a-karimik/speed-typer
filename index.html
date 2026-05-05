@@ -4,14 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SpeedTyper</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="game-container">
-      <h1>SpeedTyper</h1>
+      <header class="top-bar">
+        <h1>⌨️ SpeedTyper</h1>
+        <div class="time-options">
+          <button class="time-opt" data-time="5">5s</button>
+          <button class="time-opt" data-time="10">10s</button>
+          <button class="time-opt" data-time="30">30s</button>
+          <button class="time-opt active" data-time="60">60s</button>
+        </div>
+      </header>
 
       <div class="stats-container">
-        <div class="stat-box">Zeit: <span id="timer">10</span>s</div>
+        <div class="stat-box">Zeit: <span id="timer">60</span></div>
         <div class="stat-box">WPM: <span id="wpm">0</span></div>
       </div>
 
@@ -20,7 +32,10 @@
           <div id="text-track" class="text-track"></div>
         </div>
       </div>
-      <button id="restart-btn">Neustart</button>
+
+      <div class="controls">
+        <button id="restart-btn" class="icon-btn" title="Neustart">↻ Neustart</button>
+      </div>
     </div>
 
     <script type="module" src="script.js"></script>

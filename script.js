@@ -1,6 +1,5 @@
 import { calculateWpm } from './logic.js';
 
-// 1. Array mit verschiedenen Texten/Sätzen
 const quotes = [
   'Das ist ein einfacher Text zum Ueben. ',
   'Programmieren macht Spass, wenn es funktioniert. ',
@@ -10,49 +9,56 @@ const quotes = [
   'Ein guter Entwickler liest mehr Code als er schreibt. ',
 ];
 
-// 2. HTML-Elemente holen (angepasst an das neue HTML)
 const textTrack = document.getElementById('text-track');
 const typingWindow = document.getElementById('typing-window');
 const timerElement = document.getElementById('timer');
 const wpmElement = document.getElementById('wpm');
 const restartBtn = document.getElementById('restart-btn');
+const timeOptions = document.querySelectorAll('.time-opt');
 
-// Variablen für das Spiel
-let timeLeft = 60; // Habe es auf 60 Sekunden gestellt, damit die WPM-Berechnung perfekt stimmt!
+let selectedTime = 60; // Standardzeit
+let timeLeft = selectedTime;
 let timerInterval = null;
 let isStarted = false;
 let currentIndex = 0;
 
-// --- NEU: Einen sehr langen Text generieren ---
+// --- ZEIT-AUSWAHL LOGIK ---
+timeOptions.forEach((option) => {
+  option.addEventListener('click', (e) => {
+    // Aktive Klasse verschieben
+    timeOptions.forEach((opt) => opt.classList.remove('active'));
+    e.target.classList.add('active');
+
+    // Neue Zeit übernehmen und Spiel resetten
+    selectedTime = parseInt(e.target.getAttribute('data-time'), 10);
+    resetGame();
+  });
+});
+
 function generateLongText() {
   let longArray = [];
-  // Wir kopieren und mischen die Sätze 10 Mal, damit uns der Text nicht ausgeht
   for (let i = 0; i < 10; i++) {
     longArray = longArray.concat([...quotes].sort(() => Math.random() - 0.5));
   }
   return longArray.join('');
 }
 
-// 3. Funktion: Spiel vorbereiten und Text rendern
 function initGame() {
   textTrack.innerHTML = '';
   currentIndex = 0;
-
   const text = generateLongText();
 
-  // Jeden Buchstaben in ein <span> packen
   text.split('').forEach((character, index) => {
     const span = document.createElement('span');
     span.innerText = character;
     span.classList.add('char');
-    if (index === 0) span.classList.add('active'); // Start-Cursor
+    if (index === 0) span.classList.add('active');
     textTrack.appendChild(span);
   });
 
   updateScrollPosition();
 }
 
-// 4. Timer starten
 function startTimer() {
   timerInterval = setInterval(() => {
     timeLeft--;
@@ -65,52 +71,47 @@ function startTimer() {
   }, 1000);
 }
 
-// 5. Spiel beenden und WPM berechnen
 function endGame() {
-  // Wir zählen einfach, wie viele Buchstaben die Klasse "correct" haben
   const totalCorrect = textTrack.querySelectorAll('.correct').length;
+  // WPM Formel anpassen: Wie viel Anteil einer Minute war eingestellt?
+  const minutesPassed = selectedTime / 60;
+  const wpm = calculateWpm(totalCorrect, minutesPassed);
 
-  // WPM berechnen (Wir nutzen deine Funktion. 1 Minute = 1)
-  const wpm = calculateWpm(totalCorrect, 1);
   wpmElement.innerText = wpm;
 
-  // Schöne End-Nachricht direkt im Text-Band anzeigen
-  textTrack.style.transform = 'translateX(0px)'; // Wieder in die Mitte schieben
-  textTrack.innerHTML = `<span style="color: #4CAF50; font-family: sans-serif;">Zeit abgelaufen! Deine WPM: ${wpm}</span>`;
+  textTrack.style.transform = 'translateX(0px)';
+  textTrack.innerHTML = `<span style="color: var(--accent); font-family: 'Inter', sans-serif;">Zeit abgelaufen! Deine WPM: ${wpm}</span>`;
 }
 
-// 6. Neustart-Button Logik
-restartBtn.addEventListener('click', () => {
+// Ausgelagerte Reset-Funktion, da sie nun vom Button UND den Zeit-Optionen gebraucht wird
+function resetGame() {
   clearInterval(timerInterval);
-  timeLeft = 60; // Wieder auf 60 Sekunden
+  timeLeft = selectedTime;
   timerElement.innerText = timeLeft;
   wpmElement.innerText = '0';
   isStarted = false;
-  initGame(); // Generiert ein neues Text-Band
-});
+  initGame();
+}
 
-// 7. --- DIE NEUE TIPP-LOGIK (Scrollend) ---
+restartBtn.addEventListener('click', resetGame);
+
 document.addEventListener('keydown', (e) => {
-  // Wenn die Zeit abgelaufen ist, darf nicht mehr getippt werden
   if (timeLeft <= 0) return;
 
   const spans = document.querySelectorAll('.char');
   if (currentIndex >= spans.length) return;
 
-  // BACKSPACE-LOGIK (Löschen)
   if (e.key === 'Backspace' && currentIndex > 0) {
-    spans[currentIndex].classList.remove('active'); // Aktuellen Cursor entfernen
-    currentIndex--; // Einen Schritt zurück
-    spans[currentIndex].classList.remove('correct', 'incorrect'); // Farbe weg
-    spans[currentIndex].classList.add('active'); // Cursor dorthin setzen
-    updateScrollPosition(); // Kamera zurückschieben
+    spans[currentIndex].classList.remove('active');
+    currentIndex--;
+    spans[currentIndex].classList.remove('correct', 'incorrect');
+    spans[currentIndex].classList.add('active');
+    updateScrollPosition();
     return;
   }
 
-  // Ignoriere Tasten wie Shift, Strg, Alt (die sind länger als 1 Zeichen, z.B. "Shift")
   if (e.key.length !== 1) return;
 
-  // Starte den Timer beim allerersten Buchstaben
   if (!isStarted) {
     isStarted = true;
     startTimer();
@@ -119,14 +120,12 @@ document.addEventListener('keydown', (e) => {
   const currentSpan = spans[currentIndex];
   const typedChar = e.key;
 
-  // Prüfen, ob der Buchstabe stimmt
   if (typedChar === currentSpan.innerText) {
     currentSpan.classList.add('correct');
   } else {
     currentSpan.classList.add('incorrect');
   }
 
-  // Cursor weiterbewegen
   currentSpan.classList.remove('active');
   currentIndex++;
 
@@ -134,25 +133,19 @@ document.addEventListener('keydown', (e) => {
     spans[currentIndex].classList.add('active');
   }
 
-  // Kamera-Scroll-Effekt auslösen
   updateScrollPosition();
 });
 
-// 8. Das magische Scrolling
 function updateScrollPosition() {
   const spans = document.querySelectorAll('.char');
   if (currentIndex >= spans.length) return;
 
   const currentSpan = spans[currentIndex];
-
-  // Berechnet genau die Mitte des Fensters
   const containerHalfWidth = typingWindow.offsetWidth / 2;
   const offsetLeft = currentSpan.offsetLeft;
 
-  // Schiebt das Band so, dass der Buchstabe exakt in der Mitte sitzt
   const centerPosition = containerHalfWidth - offsetLeft;
   textTrack.style.transform = `translateX(${centerPosition}px)`;
 }
 
-// Spiel ganz am Anfang einmal starten
 initGame();
