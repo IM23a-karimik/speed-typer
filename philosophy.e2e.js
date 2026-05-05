@@ -67,8 +67,8 @@ const getFirstValidLink = async (t) => {
   // NEU: Wir prüfen sanft, ob der Link existiert, statt hart abzustürzen
   const linkExists = await firstValidLink.exists;
   if (linkExists) {
-      return firstValidLink;
+    return firstValidLink;
   } else {
-      return null;
+    return null;
   }
 };
