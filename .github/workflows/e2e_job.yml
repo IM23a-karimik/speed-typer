@@ -2,27 +2,27 @@ name: Frontend Code Quality
 
 on:
     push:
-        branches: [ 'main' ]
+        branches: ['main']
     pull_request:
-        branches: [ 'main' ]
+        branches: ['main']
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v4
-            -   name: Set up Node.js
-                uses: actions/setup-node@v4
-                with:
-                    node-version: '20'
-                    cache: 'npm'
-            -   name: Install dependencies
-                run: npm ci
-            -   name: Run Formatter
-                run: npm run format-check
-            -   name: Run Linter
-                run: npm run lint-check
-            -   name: Run Frontend Tests (Unit & Integration)
-                run: npm run test
-            -   name: Run E2e-Tests
-                run: npx testcafe chrome:headless philosophy.e2e.js
+            - uses: actions/checkout@v4
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'npm'
+            - name: Install dependencies
+              run: npm ci
+            - name: Run Formatter
+              run: npm run format-check
+            - name: Run Linter
+              run: npm run lint-check
+            - name: Run Frontend Tests (Unit & Integration)
+              run: npm run test
+            - name: Run E2e-Tests
+              run: npx testcafe chrome:headless philosophy.e2e.js
