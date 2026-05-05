@@ -21,7 +21,7 @@ jobs:
                   cache: 'npm'
 
             - name: Install dependencies
-              run: npm ci
+              run: npm install
 
             - name: Wait until Ready
               run: echo "Frontend is ready for E2E testing..."
