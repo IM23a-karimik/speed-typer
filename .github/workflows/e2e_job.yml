@@ -25,4 +25,4 @@ jobs:
             - name: Run Frontend Tests (Unit & Integration)
               run: npm run test
             - name: Run E2e-Tests
-              run: npx testcafe chrome:headless philosophy.e2e.js
+              run: npx testcafe chromium:headless philosophy.e2e.js
