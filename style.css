@@ -96,3 +96,46 @@ h1 {
   background-color: #555; /* Grauer Hintergrund als "Cursor" */
   border-radius: 3px;
 }
+
+.typing-window {
+  width: 100%;
+  max-width: 600px; /* Breite deines Spielbereichs */
+  margin: 0 auto;
+  overflow: hidden; /* Versteckt den Text, der rechts/links raushängt */
+  white-space: nowrap; /* Zwingt den Text in EINE einzige lange Zeile */
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 20px 0;
+  position: relative;
+  background-color: #f9f9f9;
+}
+
+.text-track {
+  display: inline-block;
+  /* transition sorgt für das "weiche" Scrollen beim Tippen */
+  transition: transform 0.1s ease-out;
+  /* Startposition: Ungefähr in der Mitte des Fensters */
+  transform: translateX(50%);
+}
+
+.char {
+  font-family: 'Courier New', Courier, monospace; /* Zwingend für Tippspiele */
+  font-size: 32px;
+  color: #888; /* Ungeschriebener Text ist grau */
+}
+
+/* Farben für getippte Buchstaben */
+.char.correct {
+  color: #4CAF50; /* Grün */
+}
+
+.char.incorrect {
+  color: #F44336; /* Rot */
+  background-color: #ffcccc;
+}
+
+/* Der Cursor unter dem aktuellen Buchstaben */
+.char.active {
+  border-bottom: 3px solid #333;
+  color: #333;
+}
