@@ -5,42 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SpeedTyper</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="game-container">
-      <header>
-        <div class="logo">⌨️ MonkeyTyper</div>
-        <div class="menu">
-          <div class="mode-selector">
-            <button class="mode-btn active" data-mode="time">@ Zeit</button>
-            <button class="mode-btn" data-mode="words">A Wörter</button>
-          </div>
+    <div class="app-wrapper">
+      <header class="main-header">
+        <div class="brand">
+          <span class="bolt">⚡</span>
+          <h1>Speed<span>Typer</span></h1>
+        </div>
 
-          <div class="value-selector" id="time-values">
-            <button class="val-btn" data-val="15">15</button>
-            <button class="val-btn active" data-val="30">30</button>
+        <nav class="game-settings">
+          <div class="setting-group" id="mode-select">
+            <button class="mode-btn active" data-mode="time">Zeit</button>
+            <button class="mode-btn" data-mode="words">Wörter</button>
+          </div>
+          <div class="divider"></div>
+          <div class="setting-group" id="value-select">
+            <button class="val-btn active" data-val="15">15</button>
+            <button class="val-btn" data-val="30">30</button>
             <button class="val-btn" data-val="60">60</button>
           </div>
-
-          <div class="value-selector hidden" id="word-values">
-            <button class="val-btn" data-val="10">10</button>
-            <button class="val-btn active" data-val="25">25</button>
-            <button class="val-btn" data-val="50">50</button>
-          </div>
-        </div>
+        </nav>
       </header>
 
-      <div id="time-display" class="stat">30</div>
+      <main class="game-core">
+        <div id="status-line" class="status-line">30</div>
 
-      <div id="typing-area"></div>
+        <div class="typing-container">
+          <div id="typing-area" class="typing-area"></div>
+        </div>
 
-      <div class="controls">
-        <button id="restart-btn" title="Neustart">↻ Neustart</button>
-      </div>
+        <div class="action-area">
+          <button id="restart-btn" class="btn-primary"><span class="icon">↻</span> Neustart</button>
+        </div>
+      </main>
     </div>
 
     <script type="module" src="script.js"></script>

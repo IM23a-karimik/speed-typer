@@ -128,86 +128,39 @@ const wordsPool = [
 ];
 
 const typingArea = document.getElementById('typing-area');
-const timeDisplay = document.getElementById('time-display');
+const statusLine = document.getElementById('status-line');
 const restartBtn = document.getElementById('restart-btn');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const valBtns = document.querySelectorAll('.val-btn');
-const timeValues = document.getElementById('time-values');
-const wordValues = document.getElementById('word-values');
 
 let currentMode = 'time';
-let currentValue = 30;
+let currentValue = 15;
 let timerInterval = null;
 let isStarted = false;
 let currentIndex = 0;
 let charElements = [];
 let startTime = null;
 
-// Menü: Zeit oder Wörter auswählen
-modeBtns.forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    modeBtns.forEach((b) => b.classList.remove('active'));
-    e.target.classList.add('active');
-    currentMode = e.target.dataset.mode;
-
-    if (currentMode === 'time') {
-      timeValues.classList.remove('hidden');
-      wordValues.classList.add('hidden');
-      currentValue = parseInt(
-        document.querySelector('#time-values .val-btn.active').dataset.val,
-        10,
-      );
-    } else {
-      timeValues.classList.add('hidden');
-      wordValues.classList.remove('hidden');
-      currentValue = parseInt(
-        document.querySelector('#word-values .val-btn.active').dataset.val,
-        10,
-      );
-    }
-    initGame();
-  });
-});
-
-// Menü: Zahlen auswählen (15, 30, 60 bzw. 10, 25, 50)
-valBtns.forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    const parent = e.target.parentElement;
-    parent.querySelectorAll('.val-btn').forEach((b) => b.classList.remove('active'));
-    e.target.classList.add('active');
-    currentValue = parseInt(e.target.dataset.val, 10);
-    initGame();
-  });
-});
-
-function generateText() {
-  let wordCount = currentMode === 'time' ? 200 : currentValue;
-  let textArray = [];
-  for (let i = 0; i < wordCount; i++) {
-    textArray.push(wordsPool[Math.floor(Math.random() * wordsPool.length)]);
-  }
-  return textArray;
-}
-
+// Initialisierung
 function initGame() {
   typingArea.innerHTML = '';
   charElements = [];
   currentIndex = 0;
   isStarted = false;
   clearInterval(timerInterval);
+  statusLine.innerText = currentMode === 'time' ? currentValue : `${currentValue} W.`;
 
-  if (currentMode === 'time') {
-    timeDisplay.innerText = currentValue;
-  } else {
-    timeDisplay.innerText = `${currentValue} W.`;
-  }
-
-  const words = generateText();
+  const wordCount = currentMode === 'time' ? 100 : currentValue;
+  const words = Array.from(
+    { length: wordCount },
+    () => wordsPool[Math.floor(Math.random() * wordsPool.length)],
+  );
 
   words.forEach((word, wordIdx) => {
     const wordDiv = document.createElement('div');
     wordDiv.className = 'word';
 
+    // Buchstaben des Wortes
     word.split('').forEach((char) => {
       const span = document.createElement('span');
       span.innerText = char;
@@ -216,11 +169,11 @@ function initGame() {
       charElements.push(span);
     });
 
-    // Leerzeichen am Ende des Wortes (außer beim allerletzten Wort)
+    // Space nach jedem Wort (außer dem letzten)
     if (wordIdx < words.length - 1) {
       const spaceSpan = document.createElement('span');
       spaceSpan.innerText = ' ';
-      spaceSpan.className = 'char space';
+      spaceSpan.className = 'char space-char';
       wordDiv.appendChild(spaceSpan);
       charElements.push(spaceSpan);
     }
@@ -228,24 +181,77 @@ function initGame() {
     typingArea.appendChild(wordDiv);
   });
 
-  if (charElements.length > 0) {
-    charElements[0].classList.add('active');
-  }
+  if (charElements.length > 0) charElements[0].classList.add('active');
 }
 
-function startGame() {
-  isStarted = true;
-  startTime = Date.now();
+// Event Listeners für Menü
+modeBtns.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    modeBtns.forEach((b) => b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentMode = e.target.dataset.mode;
+    initGame();
+  });
+});
 
+valBtns.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    valBtns.forEach((b) => b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentValue = parseInt(e.target.dataset.val, 10);
+    initGame();
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') initGame();
+  if (e.key.length !== 1 && e.key !== 'Backspace') return;
+  if (e.key === ' ') e.preventDefault();
+  if (currentIndex >= charElements.length) return;
+
+  if (!isStarted) {
+    isStarted = true;
+    startTime = Date.now();
+    startTimer();
+  }
+
+  if (e.key === 'Backspace' && currentIndex > 0) {
+    charElements[currentIndex].classList.remove('active');
+    currentIndex--;
+    charElements[currentIndex].classList.remove('correct', 'incorrect');
+    charElements[currentIndex].classList.add('active');
+    return;
+  }
+
+  if (e.key.length === 1) {
+    const currentSpan = charElements[currentIndex];
+    if (e.key === currentSpan.innerText) {
+      currentSpan.classList.add('correct');
+    } else {
+      currentSpan.classList.add('incorrect');
+    }
+
+    currentSpan.classList.remove('active');
+    currentIndex++;
+
+    if (currentIndex < charElements.length) {
+      charElements[currentIndex].classList.add('active');
+      charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (currentMode === 'words') {
+      endGame();
+    }
+  }
+});
+
+function startTimer() {
   timerInterval = setInterval(() => {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
-
     if (currentMode === 'time') {
       const left = currentValue - elapsed;
-      timeDisplay.innerText = left;
+      statusLine.innerText = left;
       if (left <= 0) endGame();
     } else {
-      timeDisplay.innerText = `${elapsed}s`; // Im Wort-Modus die Stoppuhr hochzählen
+      statusLine.innerText = `${elapsed}s`;
     }
   }, 1000);
 }
@@ -255,58 +261,9 @@ function endGame() {
   const totalCorrect = document.querySelectorAll('.char.correct').length;
   const elapsedMinutes = (Date.now() - startTime) / 60000;
   const wpm = calculateWpm(totalCorrect, elapsedMinutes);
-
-  typingArea.innerHTML = '';
-  timeDisplay.innerText = `WPM: ${wpm}`;
+  statusLine.innerText = `Ergebnis: ${wpm} WPM`;
   isStarted = false;
 }
 
 restartBtn.addEventListener('click', initGame);
-
-document.addEventListener('keydown', (e) => {
-  // Ignoriere alles, was keine Taste zum Tippen ist
-  if (e.key.length !== 1 && e.key !== 'Backspace') return;
-
-  // Verhindert, dass die Leertaste die Website nach unten scrollt
-  if (e.key === ' ') e.preventDefault();
-
-  if (currentIndex >= charElements.length) return;
-
-  // Backspace (Löschen)
-  if (e.key === 'Backspace' && currentIndex > 0) {
-    charElements[currentIndex].classList.remove('active');
-    currentIndex--;
-    charElements[currentIndex].classList.remove('correct', 'incorrect');
-    charElements[currentIndex].classList.add('active');
-
-    // Kamera fährt sanft zurück nach oben, falls nötig
-    charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
-  if (e.key.length !== 1) return;
-
-  if (!isStarted) startGame();
-
-  const currentSpan = charElements[currentIndex];
-
-  if (e.key === currentSpan.innerText) {
-    currentSpan.classList.add('correct');
-  } else {
-    currentSpan.classList.add('incorrect');
-  }
-
-  currentSpan.classList.remove('active');
-  currentIndex++;
-
-  if (currentIndex < charElements.length) {
-    charElements[currentIndex].classList.add('active');
-    // Die Kamera fährt sanft nach unten, wenn du in eine neue Zeile tippst!
-    charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } else if (currentMode === 'words') {
-    endGame(); // Spiel sofort beenden, wenn das letzte Wort getippt wurde
-  }
-});
-
-// Spiel beim Start initialisieren
 initGame();
