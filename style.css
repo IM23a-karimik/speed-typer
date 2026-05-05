@@ -108,9 +108,14 @@ button.active {
   line-height: 1.7;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start; /* NEU: Zwingt den Text nach oben */
   height: 140px;
   overflow: hidden;
   color: var(--text-dim);
+}
+
+.space-char {
+  white-space: pre; /* NEU: Verhindert, dass der Browser das Leerzeichen löscht */
 }
 
 .word {

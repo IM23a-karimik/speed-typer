@@ -1,5 +1,6 @@
 import { calculateWpm } from './logic.js';
 
+// Sauber formatiert, damit ESLint nicht wegen der Zeilenlänge meckert!
 const wordsPool = [
   'der',
   'die',
@@ -134,14 +135,13 @@ const modeBtns = document.querySelectorAll('.mode-btn');
 const valBtns = document.querySelectorAll('.val-btn');
 
 let currentMode = 'time';
-let currentValue = 15;
+let currentValue = 30; // Startwert auf 30 Sekunden gesetzt!
 let timerInterval = null;
 let isStarted = false;
 let currentIndex = 0;
 let charElements = [];
 let startTime = null;
 
-// Initialisierung
 function initGame() {
   typingArea.innerHTML = '';
   charElements = [];
@@ -160,7 +160,6 @@ function initGame() {
     const wordDiv = document.createElement('div');
     wordDiv.className = 'word';
 
-    // Buchstaben des Wortes
     word.split('').forEach((char) => {
       const span = document.createElement('span');
       span.innerText = char;
@@ -169,11 +168,10 @@ function initGame() {
       charElements.push(span);
     });
 
-    // Space nach jedem Wort (außer dem letzten)
     if (wordIdx < words.length - 1) {
       const spaceSpan = document.createElement('span');
       spaceSpan.innerText = ' ';
-      spaceSpan.className = 'char space-char';
+      spaceSpan.className = 'char space-char'; // Hier nutzen wir die neue CSS Klasse
       wordDiv.appendChild(spaceSpan);
       charElements.push(spaceSpan);
     }
@@ -184,7 +182,6 @@ function initGame() {
   if (charElements.length > 0) charElements[0].classList.add('active');
 }
 
-// Event Listeners für Menü
 modeBtns.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     modeBtns.forEach((b) => b.classList.remove('active'));
@@ -220,6 +217,7 @@ document.addEventListener('keydown', (e) => {
     currentIndex--;
     charElements[currentIndex].classList.remove('correct', 'incorrect');
     charElements[currentIndex].classList.add('active');
+    charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
