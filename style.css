@@ -126,11 +126,11 @@ h1 {
 
 /* Farben für getippte Buchstaben */
 .char.correct {
-  color: #4CAF50; /* Grün */
+  color: #4caf50; /* Grün */
 }
 
 .char.incorrect {
-  color: #F44336; /* Rot */
+  color: #f44336; /* Rot */
   background-color: #ffcccc;
 }
 
