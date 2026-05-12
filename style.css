@@ -1,9 +1,9 @@
 :root {
-  --bg: #0f172a;           /* Deep Slate Blue */
-  --accent: #38bdf8;       /* Bright Cyan */
-  --text-dim: #475569;     /* Slate Gray */
-  --text-bright: #f1f5f9;  /* Off White */
-  --error: #f43f5e;        /* Rose Red */
+  --bg: #0f172a; /* Deep Slate Blue */
+  --accent: #38bdf8; /* Bright Cyan */
+  --text-dim: #475569; /* Slate Gray */
+  --text-bright: #f1f5f9; /* Off White */
+  --error: #f43f5e; /* Rose Red */
   --glass: rgba(30, 41, 59, 0.7);
 }
 
@@ -151,7 +151,8 @@ button.active {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

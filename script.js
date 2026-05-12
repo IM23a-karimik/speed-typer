@@ -10,7 +10,7 @@ const sentencesPool = [
   'Das Internet hat die Art und Weise, wie wir kommunizieren, veraendert.',
   'Schnelles Tippen spart dir auf Dauer sehr viel Zeit am Computer.',
   'Es ist besser, eine Aufgabe richtig zu machen, als sie zweimal zu tun.',
-  'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.'
+  'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
 ];
 
 const typingArea = document.getElementById('typing-area');
