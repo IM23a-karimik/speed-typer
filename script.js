@@ -1,6 +1,5 @@
 import { calculateWpm } from './logic.js';
 
-// Echte Sätze für einen perfekten Schreibfluss!
 const sentencesPool = [
   'Programmieren ist die Kunst, Algorithmen in ausfuehrbaren Code zu verwandeln.',
   'Ein guter Entwickler liest deutlich mehr Code, als er selbst schreibt.',
@@ -11,7 +10,7 @@ const sentencesPool = [
   'Das Internet hat die Art und Weise, wie wir kommunizieren, veraendert.',
   'Schnelles Tippen spart dir auf Dauer sehr viel Zeit am Computer.',
   'Es ist besser, eine Aufgabe richtig zu machen, als sie zweimal zu tun.',
-  'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
+  'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.'
 ];
 
 const typingArea = document.getElementById('typing-area');
@@ -29,7 +28,7 @@ const finalAccDisplay = document.getElementById('final-acc');
 const finalErrorsDisplay = document.getElementById('final-errors');
 
 let currentMode = 'time';
-let currentValue = 15;
+let currentValue = 5; // Startwert passend zu deinen HTML Buttons
 let timerInterval = null;
 let isStarted = false;
 let isGameOver = false;
@@ -37,15 +36,12 @@ let currentIndex = 0;
 let charElements = [];
 let startTime = null;
 
-// Statistik-Variablen
 let totalKeystrokes = 0;
 let errorsCount = 0;
 
 function generateTextArray() {
-  // Sätze mischen und zu einem langen Text verbinden
   let shuffled = [...sentencesPool].sort(() => 0.5 - Math.random());
 
-  // Wenn der Text zu kurz ist, einfach noch einmal durchmischen und anhängen
   while (shuffled.length < 15) {
     shuffled = shuffled.concat([...sentencesPool].sort(() => 0.5 - Math.random()));
   }
@@ -53,11 +49,10 @@ function generateTextArray() {
   const fullText = shuffled.join(' ');
   let wordsArray = fullText.split(' ');
 
-  // Zuschneiden je nach Modus
   if (currentMode === 'words') {
     wordsArray = wordsArray.slice(0, currentValue);
   } else {
-    wordsArray = wordsArray.slice(0, 150); // Genug Wörter für 60 Sekunden
+    wordsArray = wordsArray.slice(0, 150);
   }
 
   return wordsArray;
@@ -100,7 +95,9 @@ function initGame() {
     typingArea.appendChild(wordDiv);
   });
 
-  if (charElements.length > 0) charElements[0].classList.add('active');
+  if (charElements.length > 0) {
+    charElements[0].classList.add('active');
+  }
 }
 
 modeBtns.forEach((btn) => {
@@ -123,7 +120,10 @@ valBtns.forEach((btn) => {
 
 document.addEventListener('keydown', (e) => {
   if (isGameOver) return;
-  if (e.key === 'Escape') initGame();
+  if (e.key === 'Escape') {
+    initGame();
+    return;
+  }
   if (e.key.length !== 1 && e.key !== 'Backspace') return;
   if (e.key === ' ') e.preventDefault();
   if (currentIndex >= charElements.length) return;
@@ -144,14 +144,14 @@ document.addEventListener('keydown', (e) => {
   }
 
   if (e.key.length === 1) {
-    totalKeystrokes++; // Jeden Tippfehler und Treffer zählen
+    totalKeystrokes++;
     const currentSpan = charElements[currentIndex];
 
     if (e.key === currentSpan.innerText) {
       currentSpan.classList.add('correct');
     } else {
       currentSpan.classList.add('incorrect');
-      errorsCount++; // Fehler hochzählen
+      errorsCount++;
     }
 
     currentSpan.classList.remove('active');
@@ -186,17 +186,17 @@ function endGame() {
 
   const totalCorrect = document.querySelectorAll('.char.correct').length;
   let elapsedMinutes = (Date.now() - startTime) / 60000;
-  if (elapsedMinutes <= 0) elapsedMinutes = currentValue / 60;
+  if (elapsedMinutes <= 0) {
+    elapsedMinutes = currentValue / 60;
+  }
 
   const wpm = calculateWpm(totalCorrect, elapsedMinutes);
 
-  // Genauigkeit berechnen (Keine negativen Zahlen)
   let accuracy = 100;
   if (totalKeystrokes > 0) {
     accuracy = Math.max(0, Math.round(((totalKeystrokes - errorsCount) / totalKeystrokes) * 100));
   }
 
-  // Popup mit Daten füllen
   finalWpmDisplay.innerText = wpm;
   finalAccDisplay.innerText = `${accuracy}%`;
   finalErrorsDisplay.innerText = errorsCount;
