@@ -40,3 +40,4 @@ jobs:
               with:
                   args: >
                       -Dsonar.projectKey=speed-typer
+                      -Dsonar.sources=.
