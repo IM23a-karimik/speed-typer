@@ -33,7 +33,7 @@
       </header>
 
       <main class="game-core">
-        <div id="status-line" class="status-line">30</div>
+        <div id="status-line" class="status-line">15</div>
 
         <div class="typing-container">
           <div id="typing-area" class="typing-area"></div>
@@ -43,6 +43,34 @@
           <button id="restart-btn" class="btn-primary"><span class="icon">↻</span> Neustart</button>
         </div>
       </main>
+    </div>
+
+    <div id="result-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-modal" class="close-btn" title="Schließen">✖</button>
+        <h2>Spiel beendet!</h2>
+
+        <div class="result-stats">
+          <div class="stat-box">
+            <div class="stat-label">WPM</div>
+            <div id="final-wpm" class="stat-value wpm-color">0</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Genauigkeit</div>
+            <div id="final-acc" class="stat-value">100%</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-label">Fehler</div>
+            <div id="final-errors" class="stat-value error-color">0</div>
+          </div>
+        </div>
+
+        <button id="modal-restart-btn" class="btn-primary mt-4">
+          <span class="icon">↻</span> Neue Runde
+        </button>
+      </div>
     </div>
 
     <script type="module" src="script.js"></script>
