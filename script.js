@@ -1,131 +1,17 @@
 import { calculateWpm } from './logic.js';
 
-// Sauber formatiert, damit ESLint nicht wegen der Zeilenlänge meckert!
-const wordsPool = [
-  'der',
-  'die',
-  'das',
-  'und',
-  'in',
-  'zu',
-  'den',
-  'nicht',
-  'von',
-  'sie',
-  'ist',
-  'des',
-  'sich',
-  'mit',
-  'dem',
-  'dass',
-  'er',
-  'es',
-  'ein',
-  'ich',
-  'auf',
-  'so',
-  'eine',
-  'auch',
-  'als',
-  'an',
-  'nach',
-  'wie',
-  'im',
-  'man',
-  'aber',
-  'aus',
-  'durch',
-  'wenn',
-  'nur',
-  'war',
-  'noch',
-  'werden',
-  'bei',
-  'hat',
-  'wir',
-  'was',
-  'wird',
-  'sein',
-  'einen',
-  'welche',
-  'sind',
-  'oder',
-  'zur',
-  'um',
-  'haben',
-  'einer',
-  'mir',
-  'ueber',
-  'ihm',
-  'diese',
-  'einem',
-  'ihr',
-  'eines',
-  'da',
-  'zum',
-  'kann',
-  'doch',
-  'vor',
-  'mich',
-  'ihn',
-  'du',
-  'hatte',
-  'seine',
-  'mehr',
-  'am',
-  'denn',
-  'nun',
-  'unter',
-  'sehr',
-  'selbst',
-  'schon',
-  'hier',
-  'bis',
-  'habe',
-  'ihre',
-  'dann',
-  'ihnen',
-  'seiner',
-  'alle',
-  'wieder',
-  'meine',
-  'zeit',
-  'gegen',
-  'vom',
-  'ganz',
-  'wo',
-  'muss',
-  'ohne',
-  'koennen',
-  'sei',
-  'ja',
-  'wurde',
-  'jetzt',
-  'immer',
-  'seinen',
-  'wohl',
-  'dieses',
-  'ihren',
-  'wuerde',
-  'diesen',
-  'sondern',
-  'weil',
-  'welcher',
-  'nichts',
-  'diesem',
-  'alles',
-  'waren',
-  'will',
-  'herr',
-  'viel',
-  'mein',
-  'also',
-  'soll',
-  'worden',
-  'lassen',
-  'dies',
-  'machen',
-  'ihrer',
+// Echte Sätze für einen perfekten Schreibfluss!
+const sentencesPool = [
+  'Programmieren ist die Kunst, Algorithmen in ausfuehrbaren Code zu verwandeln.',
+  'Ein guter Entwickler liest deutlich mehr Code, als er selbst schreibt.',
+  'Jeder Fehler ist eine neue Gelegenheit, etwas Wichtiges zu lernen.',
+  'Technologie entwickelt sich rasant, aber die Grundlagen bleiben gleich.',
+  'Wer aufhoert, besser werden zu wollen, hat aufgehoert, gut zu sein.',
+  'Ein sauberer Code ist wie ein Buch, er erklaert sich von selbst.',
+  'Das Internet hat die Art und Weise, wie wir kommunizieren, veraendert.',
+  'Schnelles Tippen spart dir auf Dauer sehr viel Zeit am Computer.',
+  'Es ist besser, eine Aufgabe richtig zu machen, als sie zweimal zu tun.',
+  'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
 ];
 
 const typingArea = document.getElementById('typing-area');
@@ -134,27 +20,62 @@ const restartBtn = document.getElementById('restart-btn');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const valBtns = document.querySelectorAll('.val-btn');
 
+// Modal Elemente
+const resultModal = document.getElementById('result-modal');
+const closeModalBtn = document.getElementById('close-modal');
+const modalRestartBtn = document.getElementById('modal-restart-btn');
+const finalWpmDisplay = document.getElementById('final-wpm');
+const finalAccDisplay = document.getElementById('final-acc');
+const finalErrorsDisplay = document.getElementById('final-errors');
+
 let currentMode = 'time';
-let currentValue = 30; // Startwert auf 30 Sekunden gesetzt!
+let currentValue = 15;
 let timerInterval = null;
 let isStarted = false;
+let isGameOver = false;
 let currentIndex = 0;
 let charElements = [];
 let startTime = null;
+
+// Statistik-Variablen
+let totalKeystrokes = 0;
+let errorsCount = 0;
+
+function generateTextArray() {
+  // Sätze mischen und zu einem langen Text verbinden
+  let shuffled = [...sentencesPool].sort(() => 0.5 - Math.random());
+
+  // Wenn der Text zu kurz ist, einfach noch einmal durchmischen und anhängen
+  while (shuffled.length < 15) {
+    shuffled = shuffled.concat([...sentencesPool].sort(() => 0.5 - Math.random()));
+  }
+
+  const fullText = shuffled.join(' ');
+  let wordsArray = fullText.split(' ');
+
+  // Zuschneiden je nach Modus
+  if (currentMode === 'words') {
+    wordsArray = wordsArray.slice(0, currentValue);
+  } else {
+    wordsArray = wordsArray.slice(0, 150); // Genug Wörter für 60 Sekunden
+  }
+
+  return wordsArray;
+}
 
 function initGame() {
   typingArea.innerHTML = '';
   charElements = [];
   currentIndex = 0;
+  totalKeystrokes = 0;
+  errorsCount = 0;
   isStarted = false;
+  isGameOver = false;
+  resultModal.classList.add('hidden');
   clearInterval(timerInterval);
   statusLine.innerText = currentMode === 'time' ? currentValue : `${currentValue} W.`;
 
-  const wordCount = currentMode === 'time' ? 100 : currentValue;
-  const words = Array.from(
-    { length: wordCount },
-    () => wordsPool[Math.floor(Math.random() * wordsPool.length)],
-  );
+  const words = generateTextArray();
 
   words.forEach((word, wordIdx) => {
     const wordDiv = document.createElement('div');
@@ -171,7 +92,7 @@ function initGame() {
     if (wordIdx < words.length - 1) {
       const spaceSpan = document.createElement('span');
       spaceSpan.innerText = ' ';
-      spaceSpan.className = 'char space-char'; // Hier nutzen wir die neue CSS Klasse
+      spaceSpan.className = 'char space-char';
       wordDiv.appendChild(spaceSpan);
       charElements.push(spaceSpan);
     }
@@ -201,6 +122,7 @@ valBtns.forEach((btn) => {
 });
 
 document.addEventListener('keydown', (e) => {
+  if (isGameOver) return;
   if (e.key === 'Escape') initGame();
   if (e.key.length !== 1 && e.key !== 'Backspace') return;
   if (e.key === ' ') e.preventDefault();
@@ -222,11 +144,14 @@ document.addEventListener('keydown', (e) => {
   }
 
   if (e.key.length === 1) {
+    totalKeystrokes++; // Jeden Tippfehler und Treffer zählen
     const currentSpan = charElements[currentIndex];
+
     if (e.key === currentSpan.innerText) {
       currentSpan.classList.add('correct');
     } else {
       currentSpan.classList.add('incorrect');
+      errorsCount++; // Fehler hochzählen
     }
 
     currentSpan.classList.remove('active');
@@ -256,12 +181,31 @@ function startTimer() {
 
 function endGame() {
   clearInterval(timerInterval);
-  const totalCorrect = document.querySelectorAll('.char.correct').length;
-  const elapsedMinutes = (Date.now() - startTime) / 60000;
-  const wpm = calculateWpm(totalCorrect, elapsedMinutes);
-  statusLine.innerText = `Ergebnis: ${wpm} WPM`;
   isStarted = false;
+  isGameOver = true;
+
+  const totalCorrect = document.querySelectorAll('.char.correct').length;
+  let elapsedMinutes = (Date.now() - startTime) / 60000;
+  if (elapsedMinutes <= 0) elapsedMinutes = currentValue / 60;
+
+  const wpm = calculateWpm(totalCorrect, elapsedMinutes);
+
+  // Genauigkeit berechnen (Keine negativen Zahlen)
+  let accuracy = 100;
+  if (totalKeystrokes > 0) {
+    accuracy = Math.max(0, Math.round(((totalKeystrokes - errorsCount) / totalKeystrokes) * 100));
+  }
+
+  // Popup mit Daten füllen
+  finalWpmDisplay.innerText = wpm;
+  finalAccDisplay.innerText = `${accuracy}%`;
+  finalErrorsDisplay.innerText = errorsCount;
+
+  resultModal.classList.remove('hidden');
 }
 
 restartBtn.addEventListener('click', initGame);
+closeModalBtn.addEventListener('click', initGame);
+modalRestartBtn.addEventListener('click', initGame);
+
 initGame();

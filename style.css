@@ -180,3 +180,46 @@ button.active {
   color: var(--accent);
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
 }
+
+/* --- ERWEITERTES MODAL --- */
+.result-stats {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  margin: 2rem 0;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 3.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  color: var(--text-bright);
+}
+
+.wpm-color {
+  color: var(--accent);
+}
+.error-color {
+  color: var(--error);
+}
+
+.mt-4 {
+  margin-top: 2rem;
+}
