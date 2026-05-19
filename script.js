@@ -18,6 +18,7 @@ const statusLine = document.getElementById('status-line');
 const restartBtn = document.getElementById('restart-btn');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const valBtns = document.querySelectorAll('.val-btn');
+const progressBar = document.getElementById('progress-bar');
 
 // Modal Elemente
 const resultModal = document.getElementById('result-modal');
@@ -69,6 +70,10 @@ function initGame() {
   resultModal.classList.add('hidden');
   clearInterval(timerInterval);
   statusLine.innerText = currentMode === 'time' ? currentValue : `${currentValue} W.`;
+
+  // Progress Bar zurücksetzen
+  progressBar.style.width = currentMode === 'time' ? '100%' : '0%';
+  progressBar.classList.remove('danger');
 
   const words = generateTextArray();
 
@@ -157,6 +162,13 @@ document.addEventListener('keydown', (e) => {
     currentSpan.classList.remove('active');
     currentIndex++;
 
+    // Balken auffüllen im Wörter-Modus
+    if (currentMode === 'words') {
+      const percentage = (currentIndex / charElements.length) * 100;
+      progressBar.style.width = `${percentage}%`;
+      progressBar.style.transition = 'width 0.1s linear';
+    }
+
     if (currentIndex < charElements.length) {
       charElements[currentIndex].classList.add('active');
       charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -172,6 +184,12 @@ function startTimer() {
     if (currentMode === 'time') {
       const left = currentValue - elapsed;
       statusLine.innerText = left;
+
+      // Balken verkleinern und rot machen
+      const percentage = (left / currentValue) * 100;
+      progressBar.style.width = `${percentage}%`;
+      if (left <= 3) progressBar.classList.add('danger');
+
       if (left <= 0) endGame();
     } else {
       statusLine.innerText = `${elapsed}s`;

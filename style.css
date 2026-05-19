@@ -280,3 +280,28 @@ button.active {
 .mt-4 {
   margin-top: 2rem;
 }
+
+/* --- PROGRESS BAR --- */
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  transition:
+    width 1s linear,
+    background-color 0.3s ease;
+}
+
+/* Leuchteffekt für die letzten Sekunden */
+.progress-bar.danger {
+  background: var(--error);
+  box-shadow: 0 0 15px var(--error);
+}
