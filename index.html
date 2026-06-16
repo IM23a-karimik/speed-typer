@@ -9,6 +9,10 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <script>
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    </script>
   </head>
   <body>
     <div class="mobile-warning">
@@ -53,6 +57,7 @@
               <button class="lang-btn active" data-lang="de">DE</button>
               <button class="lang-btn" data-lang="en">EN</button>
               <button class="lang-btn" data-lang="es">ES</button>
+              <button class="lang-btn" data-lang="code">Code</button>
             </div>
           </div>
 
@@ -67,10 +72,19 @@
           </div>
 
           <div class="setting-section">
+            <h3>🖱️ Cursor (Caret)</h3>
+            <div class="setting-group" id="caret-select">
+              <button class="caret-btn active" data-caret="line">Linie</button>
+              <button class="caret-btn" data-caret="block">Block</button>
+              <button class="caret-btn" data-caret="underline">Strich</button>
+            </div>
+          </div>
+
+          <div class="setting-section">
             <h3>🔥 Schwierigkeit</h3>
             <div class="setting-group" id="diff-select">
-              <button class="diff-btn" data-diff="normal">Normal (Leicht)</button>
-              <button class="diff-btn active" data-diff="hard">Hard (Sätze)</button>
+              <button class="diff-btn" data-diff="normal">Normal</button>
+              <button class="diff-btn active" data-diff="hard">Hard</button>
             </div>
           </div>
 
@@ -127,6 +141,10 @@
           <div class="stat-box">
             <div class="stat-label">Fehler</div>
             <div id="final-errors" class="stat-value error-color">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Raw WPM</div>
+            <div id="final-raw-wpm" class="stat-value">0</div>
           </div>
         </div>
 

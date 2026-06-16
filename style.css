@@ -83,6 +83,7 @@ body {
   display: none;
   z-index: 1000;
 }
+
 @media (max-width: 768px) {
   .mobile-warning {
     display: block;
@@ -95,21 +96,25 @@ body {
   padding: 2rem;
   position: relative;
 }
+
 .main-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4rem;
 }
+
 .brand {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
+
 .brand h1 {
   font-size: 1.5rem;
   letter-spacing: -1px;
 }
+
 .brand h1 span {
   color: var(--accent);
 }
@@ -130,6 +135,7 @@ body {
   color: var(--text-bright);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .icon-btn:hover {
   border-color: var(--accent);
   transform: rotate(90deg) scale(1.1);
@@ -144,6 +150,7 @@ body {
   margin-bottom: 1.5rem;
   opacity: 0.8;
 }
+
 .progress-container {
   width: 100%;
   height: 6px;
@@ -152,6 +159,7 @@ body {
   margin-bottom: 2rem;
   overflow: hidden;
 }
+
 .progress-bar {
   height: 100%;
   width: 100%;
@@ -160,6 +168,7 @@ body {
     width 1s linear,
     background-color 0.3s ease;
 }
+
 .progress-bar.danger {
   background: var(--error);
   box-shadow: 0 0 15px var(--error);
@@ -168,6 +177,7 @@ body {
 .typing-container {
   position: relative;
 }
+
 .start-hint {
   position: absolute;
   top: -30px;
@@ -176,6 +186,7 @@ body {
   font-size: 1.2rem;
   transition: opacity 0.3s;
 }
+
 .start-hint.hidden {
   opacity: 0;
 }
@@ -190,16 +201,36 @@ body {
   height: 140px;
   overflow: hidden;
   color: var(--text-dim);
+  --caret-type: pulse 1s infinite;
+  --caret-w: 100%;
+  --caret-h: 3px;
+  --caret-bg: var(--accent);
 }
+
+.typing-area.caret-block {
+  --caret-w: 100%;
+  --caret-h: 100%;
+  --caret-bg: rgba(56, 189, 248, 0.4);
+  --caret-type: none;
+}
+
+.typing-area.caret-line {
+  --caret-w: 2px;
+  --caret-h: 100%;
+  --caret-bg: var(--accent);
+}
+
 .word {
   display: flex;
   margin-right: 0.8rem;
   margin-bottom: 0.5rem;
 }
+
 .char {
   transition: color 0.1s;
   position: relative;
 }
+
 .char.correct {
   color: var(--text-bright);
 }
@@ -211,6 +242,7 @@ body {
   border-radius: 3px;
   animation: shake 0.2s;
 }
+
 @keyframes shake {
   0%,
   100% {
@@ -228,6 +260,7 @@ body {
 .space-char {
   white-space: pre;
 }
+
 .space-char.active {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
@@ -239,12 +272,12 @@ body {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
-  animation: pulse 1s infinite;
+  width: var(--caret-w);
+  height: var(--caret-h);
+  background: var(--caret-bg);
+  animation: var(--caret-type);
 }
+
 @keyframes pulse {
   0%,
   100% {
@@ -258,7 +291,9 @@ body {
 .action-area {
   margin-top: 3rem;
   text-align: center;
+  transition: opacity 0.3s ease;
 }
+
 .btn-primary {
   background: var(--glass);
   border: 1px solid var(--border-color);
@@ -272,6 +307,7 @@ body {
   cursor: pointer;
   transition: all 0.3s;
 }
+
 .btn-primary:hover {
   border-color: var(--accent);
   color: var(--accent);
@@ -292,10 +328,12 @@ body {
   z-index: 9999;
   transition: all 0.3s ease;
 }
+
 .modal.hidden {
   display: none !important;
   pointer-events: none;
 }
+
 .modal-content {
   background: var(--modal-bg);
   border: 2px solid var(--accent);
@@ -307,7 +345,29 @@ body {
   max-width: 600px;
   width: 90%;
   color: var(--text-bright);
+  max-height: 85vh;
+  overflow-y: auto;
 }
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--text-dim);
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
 .settings-content-large {
   max-width: 800px !important;
 }
@@ -323,9 +383,11 @@ body {
   cursor: pointer;
   transition: color 0.2s;
 }
+
 .close-btn:hover {
   color: var(--error);
 }
+
 .modal-content h2 {
   font-size: 2rem;
   margin-bottom: 2rem;
@@ -338,17 +400,20 @@ body {
   text-align: left;
   margin-bottom: 2rem;
 }
+
 @media (max-width: 600px) {
   .settings-grid {
     grid-template-columns: 1fr;
   }
 }
+
 .setting-section h3 {
   font-size: 0.8rem;
   color: var(--text-dim);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
 }
+
 .setting-group {
   display: flex;
   gap: 0.5rem;
@@ -370,9 +435,11 @@ button {
   border-radius: 6px;
   transition: all 0.2s;
 }
+
 button:hover {
   color: var(--text-bright);
 }
+
 button.active {
   color: var(--accent);
   background: var(--box-bg);
@@ -385,11 +452,13 @@ button.active {
   padding-top: 1.5rem;
   text-align: left;
 }
+
 .local-history-section h3 {
   font-size: 1rem;
   color: var(--accent);
   margin-bottom: 1rem;
 }
+
 .history-list {
   list-style: none;
   display: flex;
@@ -398,6 +467,7 @@ button.active {
   max-height: 120px;
   overflow-y: auto;
 }
+
 .history-list li {
   background: var(--box-bg);
   padding: 0.8rem;
@@ -418,17 +488,20 @@ button.active {
   padding: 1.5rem;
   border-radius: 16px;
 }
+
 .stat-box {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .stat-label {
   font-size: 0.8rem;
   color: var(--text-dim);
   text-transform: uppercase;
   font-weight: 600;
 }
+
 .stat-value {
   font-size: 3rem;
   font-family: 'JetBrains Mono', monospace;
@@ -436,9 +509,11 @@ button.active {
   margin-top: 0.5rem;
   color: var(--text-bright);
 }
+
 .wpm-color {
   color: var(--accent);
 }
+
 .error-color {
   color: var(--error);
 }
@@ -448,11 +523,13 @@ button.active {
   margin-top: 1.5rem;
   text-align: left;
 }
+
 .chart-title {
   font-size: 0.9rem;
   color: var(--text-dim);
   margin-bottom: 0.5rem;
 }
+
 .wpm-chart {
   display: flex;
   align-items: flex-end;
@@ -463,6 +540,7 @@ button.active {
   border-radius: 12px;
   border: 1px solid var(--border-color);
 }
+
 .chart-bar {
   flex: 1;
   background: var(--accent);
@@ -471,6 +549,7 @@ button.active {
   transition: height 0.5s;
   position: relative;
 }
+
 .chart-bar:hover::after {
   content: attr(data-wpm);
   position: absolute;
@@ -481,4 +560,19 @@ button.active {
   background: var(--bg);
   padding: 2px 4px;
   border-radius: 4px;
+}
+
+/* --- ZEN MODUS --- */
+body.zen-mode .main-header,
+body.zen-mode .action-area,
+body.zen-mode .mobile-warning {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.main-header,
+.action-area,
+.mobile-warning {
+  transition: opacity 0.3s ease;
 }

@@ -6,36 +6,29 @@ const sentencesData = {
     'Ein guter Entwickler liest deutlich mehr Code, als er selbst schreibt.',
     'Jeder Fehler ist eine neue Gelegenheit, etwas Wichtiges zu lernen.',
     'Technologie entwickelt sich rasant, aber die Grundlagen bleiben gleich.',
-    'Wer aufhört, besser werden zu wollen, hat aufgehört, gut zu sein.',
     'Ein sauberer Code ist wie ein Buch, er erklärt sich von selbst.',
-    'Das Internet hat die Art und Weise, wie wir kommunizieren, verändert.',
-    'Schnelles Tippen spart dir auf Dauer sehr viel Zeit am Computer.',
-    'Es ist besser, eine Aufgabe richtig zu machen, als sie zweimal zu tun.',
-    'Künstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
   ],
   en: [
     'Programming is the art of turning algorithms into executable code.',
     'A good developer reads significantly more code than they write.',
     'Every mistake is a new opportunity to learn something important.',
     'Technology evolves rapidly, but the fundamentals remain the same.',
-    'He who stops wanting to become better has stopped being good.',
     'Clean code is like a book, it explains itself.',
-    'The internet has changed the way we communicate.',
-    'Fast typing saves you a lot of time on the computer.',
-    'It is better to do a task right than to do it twice.',
-    'Artificial intelligence will help us work even more creatively.',
   ],
   es: [
-    'Programar es el arte de convertir algoritmos en código ejecutable.',
-    'Un buen desarrollador lee mucho más código del que escribe.',
+    'Programar es el arte de convertir algoritmos en codigo ejecutable.',
+    'Un buen desarrollador lee mucho mas codigo del que escribe.',
     'Cada error es una nueva oportunidad para aprender algo importante.',
-    'La tecnología evoluciona rápidamente, pero los fundamentos son los mismos.',
-    'Quien deja de mejorar, ha dejado de ser bueno.',
-    'El código limpio es como un libro, se explica por sí mismo.',
-    'Internet ha cambiado la forma en que nos comunicamos.',
-    'Escribir rápido te ahorra mucho tiempo en la computadora.',
-    'Es mejor hacer una tarea bien que hacerla dos veces.',
-    'La inteligencia artificial nos ayudará a ser más creativos.',
+    'La tecnologia evoluciona rapidamente, pero los fundamentos son los mismos.',
+    'El codigo limpio es como un libro, se explica por si mismo.',
+  ],
+  code: [
+    'const str = "Hello World";',
+    'function sum(a, b) { return a + b; }',
+    'let items = array.map(x => x * 2);',
+    'if (isTrue) { execute(); } else { return false; }',
+    'console.log("Debugging is fun!");',
+    'document.getElementById("app").innerHTML = "Done";',
   ],
 };
 
@@ -67,8 +60,11 @@ const modalRestartBtn = document.getElementById('modal-restart-btn');
 const finalWpmDisplay = document.getElementById('final-wpm');
 const finalAccDisplay = document.getElementById('final-acc');
 const finalErrorsDisplay = document.getElementById('final-errors');
+const finalRawWpmDisplay = document.getElementById('final-raw-wpm');
+const caretBtns = document.querySelectorAll('.caret-btn');
 
 // Game State
+let currentCaret = 'line';
 let currentLang = 'de';
 let currentTheme = 'default';
 let currentDiff = 'hard'; // 'normal' = kleinbuchstaben, keine satzzeichen
@@ -89,6 +85,7 @@ let wpmHistory = [];
 
 // Audio Setup (Web Audio API)
 let audioCtx;
+
 function playTypingSound(isError) {
   if (!soundEnabled) return;
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -164,6 +161,8 @@ function generateTextArray() {
 }
 
 function initGame() {
+  document.body.classList.remove('zen-mode');
+
   typingArea.innerHTML = '';
   charElements = [];
   currentIndex = 0;
@@ -207,6 +206,43 @@ function initGame() {
   if (charElements.length > 0) charElements[0].classList.add('active');
 }
 
+// Local Storage Settings
+function saveSettings() {
+  const settings = {
+    currentLang,
+    currentTheme,
+    currentDiff,
+    soundEnabled,
+    currentMode,
+    currentValue,
+    currentCaret,
+  };
+  localStorage.setItem('speedTyperSettings', JSON.stringify(settings));
+}
+
+function loadSettings() {
+  const saved = JSON.parse(localStorage.getItem('speedTyperSettings'));
+  if (!saved) return;
+  currentLang = saved.currentLang;
+  currentTheme = saved.currentTheme;
+  currentDiff = saved.currentDiff;
+  soundEnabled = saved.soundEnabled;
+  currentMode = saved.currentMode;
+  currentValue = saved.currentValue;
+  currentCaret = saved.currentCaret;
+
+  if (currentTheme !== 'default') document.body.classList.add(currentTheme);
+  typingArea.className = `typing-area caret-${currentCaret}`;
+
+  document.querySelector(`.lang-btn[data-lang="${currentLang}"]`)?.click();
+  document.querySelector(`.diff-btn[data-diff="${currentDiff}"]`)?.click();
+  document.querySelector(`.theme-btn[data-theme="${currentTheme}"]`)?.click();
+  document.querySelector(`.sound-btn[data-sound="${soundEnabled ? 'on' : 'off'}"]`)?.click();
+  document.querySelector(`.mode-btn[data-mode="${currentMode}"]`)?.click();
+  document.querySelector(`.val-btn[data-val="${currentValue}"]`)?.click();
+  document.querySelector(`.caret-btn[data-caret="${currentCaret}"]`)?.click();
+}
+
 // Event Listeners for Settings
 function setupToggleButtons(nodeList, updateVarFn) {
   nodeList.forEach((btn) => {
@@ -214,6 +250,7 @@ function setupToggleButtons(nodeList, updateVarFn) {
       nodeList.forEach((b) => b.classList.remove('active'));
       e.target.classList.add('active');
       updateVarFn(e.target);
+      saveSettings();
       initGame();
     });
   });
@@ -224,6 +261,10 @@ setupToggleButtons(diffBtns, (t) => (currentDiff = t.dataset.diff));
 setupToggleButtons(soundBtns, (t) => (soundEnabled = t.dataset.sound === 'on'));
 setupToggleButtons(modeBtns, (t) => (currentMode = t.dataset.mode));
 setupToggleButtons(valBtns, (t) => (currentValue = parseInt(t.dataset.val, 10)));
+setupToggleButtons(caretBtns, (t) => {
+  currentCaret = t.dataset.caret;
+  typingArea.className = `typing-area caret-${currentCaret}`;
+});
 
 themeBtns.forEach((btn) => {
   btn.addEventListener('click', (e) => {
@@ -231,7 +272,9 @@ themeBtns.forEach((btn) => {
     e.target.classList.add('active');
     document.body.className = '';
     const selectedTheme = e.target.dataset.theme;
+    currentTheme = selectedTheme;
     if (selectedTheme !== 'default') document.body.classList.add(selectedTheme);
+    saveSettings();
   });
 });
 
@@ -245,7 +288,9 @@ closeSettingsModalBtn.addEventListener('click', () => settingsModal.classList.ad
 document.addEventListener('keydown', (e) => {
   if (!settingsModal.classList.contains('hidden') || isGameOver) return;
 
-  if (e.key === 'Escape') {
+  // Tab oder Esc für schnellen Neustart
+  if (e.key === 'Escape' || e.key === 'Tab') {
+    e.preventDefault();
     initGame();
     return;
   }
@@ -256,6 +301,7 @@ document.addEventListener('keydown', (e) => {
   if (!isStarted) {
     isStarted = true;
     startHint.classList.add('hidden');
+    document.body.classList.add('zen-mode'); // Zen-Modus aktivieren
     startTime = Date.now();
     startTimer();
   }
@@ -339,6 +385,8 @@ function renderChart() {
 }
 
 function endGame() {
+  document.body.classList.remove('zen-mode');
+
   clearInterval(timerInterval);
   isStarted = false;
   isGameOver = true;
@@ -352,6 +400,9 @@ function endGame() {
   if (totalKeystrokes > 0) {
     accuracy = Math.max(0, Math.round(((totalKeystrokes - errorsCount) / totalKeystrokes) * 100));
   }
+
+  const rawWpm = Math.round(totalKeystrokes / 5 / elapsedMinutes);
+  finalRawWpmDisplay.innerText = rawWpm;
 
   finalWpmDisplay.innerText = wpm;
   finalAccDisplay.innerText = `${accuracy}%`;
@@ -368,4 +419,5 @@ closeModalBtn.addEventListener('click', initGame);
 modalRestartBtn.addEventListener('click', initGame);
 
 loadHistory();
+loadSettings();
 initGame();
