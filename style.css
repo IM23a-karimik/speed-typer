@@ -1,10 +1,57 @@
 :root {
-  --bg: #0f172a; /* Deep Slate Blue */
-  --accent: #38bdf8; /* Bright Cyan */
-  --text-dim: #475569; /* Slate Gray */
-  --text-bright: #f1f5f9; /* Off White */
-  --error: #f43f5e; /* Rose Red */
+  /* STANDARD THEME: Cyber Blue */
+  --bg: #0f172a;
+  --accent: #38bdf8;
+  --text-dim: #475569;
+  --text-bright: #f1f5f9;
+  --error: #f43f5e;
   --glass: rgba(30, 41, 59, 0.7);
+  --modal-bg: #1e293b;
+  --modal-overlay: rgba(7, 10, 18, 0.9);
+  --border-color: rgba(255, 255, 255, 0.05);
+  --box-bg: rgba(15, 23, 42, 0.5);
+}
+
+body.theme-light {
+  /* THEME: Clean White/Gray */
+  --bg: #f8fafc;
+  --accent: #0284c7;
+  --text-dim: #94a3b8;
+  --text-bright: #0f172a;
+  --error: #e11d48;
+  --glass: rgba(255, 255, 255, 0.9);
+  --modal-bg: #ffffff;
+  --modal-overlay: rgba(15, 23, 42, 0.4);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --box-bg: rgba(241, 245, 249, 0.8);
+}
+
+body.theme-neon {
+  /* THEME: Synthwave Neon */
+  --bg: #09090b;
+  --accent: #c026d3;
+  --text-dim: #52525b;
+  --text-bright: #2dd4bf;
+  --error: #e11d48;
+  --glass: rgba(24, 24, 27, 0.7);
+  --modal-bg: #18181b;
+  --modal-overlay: rgba(0, 0, 0, 0.9);
+  --border-color: rgba(255, 255, 255, 0.05);
+  --box-bg: rgba(39, 39, 42, 0.5);
+}
+
+body.theme-matrix {
+  /* THEME: Hacker Green */
+  --bg: #000000;
+  --accent: #22c55e;
+  --text-dim: #14532d;
+  --text-bright: #4ade80;
+  --error: #ef4444;
+  --glass: rgba(0, 20, 0, 0.7);
+  --modal-bg: #052e16;
+  --modal-overlay: rgba(0, 0, 0, 0.9);
+  --border-color: rgba(34, 197, 94, 0.2);
+  --box-bg: rgba(20, 83, 45, 0.3);
 }
 
 * {
@@ -21,6 +68,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
 }
 
 .app-wrapper {
@@ -29,7 +79,6 @@ body {
   padding: 2rem;
 }
 
-/* --- HEADER & NAV --- */
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -52,25 +101,55 @@ body {
   color: var(--accent);
 }
 
-.game-settings {
+.icon-btn {
+  font-size: 1.5rem;
   background: var(--glass);
-  padding: 0.4rem;
-  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  color: var(--text-bright);
+}
+
+.icon-btn:hover {
+  border-color: var(--accent);
+  transform: rotate(90deg);
+  box-shadow: 0 0 15px var(--accent);
+}
+
+.settings-content {
+  max-width: 450px !important;
+}
+
+.settings-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.setting-section h3 {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .setting-group {
   display: flex;
   gap: 0.5rem;
-}
-
-.divider {
-  width: 1px;
-  height: 20px;
-  background: var(--text-dim);
+  background: var(--box-bg);
+  padding: 0.8rem;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  border: 1px solid var(--border-color);
 }
 
 button {
@@ -91,16 +170,39 @@ button:hover {
 
 button.active {
   color: var(--accent);
-  background: rgba(56, 189, 248, 0.1);
+  background: var(--box-bg);
+  border: 1px solid var(--accent);
 }
 
-/* --- GAME CORE --- */
 .status-line {
   font-family: 'JetBrains Mono', monospace;
   font-size: 2rem;
   color: var(--accent);
   margin-bottom: 1.5rem;
   opacity: 0.8;
+}
+
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  transition:
+    width 1s linear,
+    background-color 0.3s ease;
+}
+
+.progress-bar.danger {
+  background: var(--error);
+  box-shadow: 0 0 15px var(--error);
 }
 
 .typing-area {
@@ -160,7 +262,6 @@ button.active {
   }
 }
 
-/* --- RESTART BUTTON --- */
 .action-area {
   margin-top: 3rem;
   text-align: center;
@@ -168,7 +269,7 @@ button.active {
 
 .btn-primary {
   background: var(--glass);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  border: 1px solid var(--border-color);
   color: var(--text-dim);
   padding: 0.8rem 2rem;
   font-size: 1.1rem;
@@ -181,16 +282,15 @@ button.active {
 .btn-primary:hover {
   border-color: var(--accent);
   color: var(--accent);
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+  box-shadow: 0 0 20px var(--accent);
 }
 
-/* --- ERWEITERTES MODAL (Zentriert & Blur) --- */
 .modal {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  background: rgba(7, 10, 18, 0.9);
+  background: var(--modal-overlay);
   backdrop-filter: blur(12px);
   display: flex;
   justify-content: center;
@@ -205,15 +305,16 @@ button.active {
 }
 
 .modal-content {
-  background: #1e293b;
+  background: var(--modal-bg);
   border: 2px solid var(--accent);
   padding: 4rem;
   border-radius: 24px;
   text-align: center;
   position: relative;
-  box-shadow: 0 0 50px rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 30px var(--accent);
   max-width: 600px;
   width: 90%;
+  color: var(--text-bright);
 }
 
 .close-btn {
@@ -233,7 +334,6 @@ button.active {
 
 .modal-content h2 {
   font-size: 2.5rem;
-  color: var(--text-bright);
   margin-bottom: 1rem;
 }
 
@@ -242,7 +342,7 @@ button.active {
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   margin: 2.5rem 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--box-bg);
   padding: 2rem;
   border-radius: 16px;
 }
@@ -272,36 +372,9 @@ button.active {
 .wpm-color {
   color: var(--accent);
 }
-
 .error-color {
   color: var(--error);
 }
-
 .mt-4 {
   margin-top: 2rem;
-}
-
-/* --- PROGRESS BAR --- */
-.progress-container {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  margin-bottom: 2rem;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  width: 100%;
-  background: var(--accent);
-  transition:
-    width 1s linear,
-    background-color 0.3s ease;
-}
-
-/* Leuchteffekt für die letzten Sekunden */
-.progress-bar.danger {
-  background: var(--error);
-  box-shadow: 0 0 15px var(--error);
 }

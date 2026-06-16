@@ -18,9 +18,13 @@ const statusLine = document.getElementById('status-line');
 const restartBtn = document.getElementById('restart-btn');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const valBtns = document.querySelectorAll('.val-btn');
+const themeBtns = document.querySelectorAll('.theme-btn');
 const progressBar = document.getElementById('progress-bar');
 
-// Modal Elemente
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const closeSettingsModalBtn = document.getElementById('close-settings-modal');
+
 const resultModal = document.getElementById('result-modal');
 const closeModalBtn = document.getElementById('close-modal');
 const modalRestartBtn = document.getElementById('modal-restart-btn');
@@ -29,7 +33,7 @@ const finalAccDisplay = document.getElementById('final-acc');
 const finalErrorsDisplay = document.getElementById('final-errors');
 
 let currentMode = 'time';
-let currentValue = 5; // Startwert passend zu deinen HTML Buttons
+let currentValue = 5;
 let timerInterval = null;
 let isStarted = false;
 let isGameOver = false;
@@ -71,7 +75,6 @@ function initGame() {
   clearInterval(timerInterval);
   statusLine.innerText = currentMode === 'time' ? currentValue : `${currentValue} W.`;
 
-  // Progress Bar zurücksetzen
   progressBar.style.width = currentMode === 'time' ? '100%' : '0%';
   progressBar.classList.remove('danger');
 
@@ -105,6 +108,28 @@ function initGame() {
   }
 }
 
+// Settings & Theme Logik
+settingsBtn.addEventListener('click', () => {
+  settingsModal.classList.remove('hidden');
+});
+
+closeSettingsModalBtn.addEventListener('click', () => {
+  settingsModal.classList.add('hidden');
+});
+
+themeBtns.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    themeBtns.forEach((b) => b.classList.remove('active'));
+    e.target.classList.add('active');
+
+    const selectedTheme = e.target.dataset.theme;
+    document.body.className = ''; // Setzt alle Klassen zurück
+    if (selectedTheme !== 'default') {
+      document.body.classList.add(selectedTheme);
+    }
+  });
+});
+
 modeBtns.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     modeBtns.forEach((b) => b.classList.remove('active'));
@@ -124,7 +149,8 @@ valBtns.forEach((btn) => {
 });
 
 document.addEventListener('keydown', (e) => {
-  if (isGameOver) return;
+  if (!settingsModal.classList.contains('hidden') || isGameOver) return;
+
   if (e.key === 'Escape') {
     initGame();
     return;
@@ -162,7 +188,6 @@ document.addEventListener('keydown', (e) => {
     currentSpan.classList.remove('active');
     currentIndex++;
 
-    // Balken auffüllen im Wörter-Modus
     if (currentMode === 'words') {
       const percentage = (currentIndex / charElements.length) * 100;
       progressBar.style.width = `${percentage}%`;
@@ -185,7 +210,6 @@ function startTimer() {
       const left = currentValue - elapsed;
       statusLine.innerText = left;
 
-      // Balken verkleinern und rot machen
       const percentage = (left / currentValue) * 100;
       progressBar.style.width = `${percentage}%`;
       if (left <= 3) progressBar.classList.add('danger');

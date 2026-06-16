@@ -18,19 +18,7 @@
           <h1>Speed<span>Typer</span></h1>
         </div>
 
-        <nav class="game-settings">
-          <div class="setting-group" id="mode-select">
-            <button class="mode-btn active" data-mode="time">Zeit</button>
-            <button class="mode-btn" data-mode="words">Wörter</button>
-          </div>
-          <div class="divider"></div>
-          <div class="setting-group" id="value-select">
-            <button class="val-btn active" data-val="5">5</button>
-            <button class="val-btn" data-val="10">10</button>
-            <button class="val-btn" data-val="20">20</button>
-            <button class="val-btn" data-val="30">30</button>
-          </div>
-        </nav>
+        <button id="settings-btn" class="icon-btn" title="Einstellungen">⚙️</button>
       </header>
 
       <main class="game-core">
@@ -48,6 +36,43 @@
           <button id="restart-btn" class="btn-primary"><span class="icon">↻</span> Neustart</button>
         </div>
       </main>
+    </div>
+
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content settings-content">
+        <button id="close-settings-modal" class="close-btn" title="Schließen">✖</button>
+        <h2>Einstellungen</h2>
+
+        <div class="settings-layout">
+          <div class="setting-section">
+            <h3>Farbschema</h3>
+            <div class="setting-group" id="theme-select">
+              <button class="theme-btn active" data-theme="default">Cyber</button>
+              <button class="theme-btn" data-theme="theme-light">Light</button>
+              <button class="theme-btn" data-theme="theme-neon">Neon</button>
+              <button class="theme-btn" data-theme="theme-matrix">Matrix</button>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <h3>Modus</h3>
+            <div class="setting-group" id="mode-select">
+              <button class="mode-btn active" data-mode="time">Zeit</button>
+              <button class="mode-btn" data-mode="words">Wörter</button>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <h3>Dauer / Anzahl</h3>
+            <div class="setting-group" id="value-select">
+              <button class="val-btn active" data-val="5">5</button>
+              <button class="val-btn" data-val="10">10</button>
+              <button class="val-btn" data-val="20">20</button>
+              <button class="val-btn" data-val="30">30</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="result-modal" class="modal hidden">
