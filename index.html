@@ -11,24 +11,27 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <div class="mobile-warning">
+      ⚠️ Am PC hast du das beste Erlebnis! Bitte nutze eine physische Tastatur.
+    </div>
+
     <div class="app-wrapper">
       <header class="main-header">
         <div class="brand">
           <span class="bolt">⚡</span>
           <h1>Speed<span>Typer</span></h1>
         </div>
-
         <button id="settings-btn" class="icon-btn" title="Einstellungen">⚙️</button>
       </header>
 
       <main class="game-core">
         <div id="status-line" class="status-line">5</div>
-
         <div class="progress-container">
           <div id="progress-bar" class="progress-bar"></div>
         </div>
 
         <div class="typing-container">
+          <div id="start-hint" class="start-hint">Einfach lostippen...</div>
           <div id="typing-area" class="typing-area"></div>
         </div>
 
@@ -39,35 +42,22 @@
     </div>
 
     <div id="settings-modal" class="modal hidden">
-      <div class="modal-content settings-content">
-        <div id="view-main" class="settings-view">
-          <button class="close-btn close-all-btn" title="Schließen">✖</button>
-          <h2>Einstellungen</h2>
-          <div class="settings-layout">
-            <button class="settings-nav-btn" data-target="view-lang">🌍 Spracheinstellungen</button>
-            <button class="settings-nav-btn" data-target="view-theme">🎨 Farbschema ändern</button>
-            <button class="settings-nav-btn" data-target="view-mode">⏱️ Modus & Dauer</button>
-          </div>
-        </div>
+      <div class="modal-content settings-content-large">
+        <button id="close-settings-modal" class="close-btn" title="Schließen">✖</button>
+        <h2>Einstellungen</h2>
 
-        <div id="view-lang" class="settings-view hidden">
-          <button class="back-btn" title="Zurück">⬅</button>
-          <button class="close-btn close-all-btn" title="Schließen">✖</button>
-          <h2>Sprache</h2>
-          <div class="settings-layout">
+        <div class="settings-grid">
+          <div class="setting-section">
+            <h3>🌍 Sprache</h3>
             <div class="setting-group" id="lang-select">
-              <button class="lang-btn active" data-lang="de">Deutsch</button>
-              <button class="lang-btn" data-lang="en">English</button>
-              <button class="lang-btn" data-lang="es">Español</button>
+              <button class="lang-btn active" data-lang="de">DE</button>
+              <button class="lang-btn" data-lang="en">EN</button>
+              <button class="lang-btn" data-lang="es">ES</button>
             </div>
           </div>
-        </div>
 
-        <div id="view-theme" class="settings-view hidden">
-          <button class="back-btn" title="Zurück">⬅</button>
-          <button class="close-btn close-all-btn" title="Schließen">✖</button>
-          <h2>Farbschema</h2>
-          <div class="settings-layout">
+          <div class="setting-section">
+            <h3>🎨 Theme</h3>
             <div class="setting-group" id="theme-select">
               <button class="theme-btn active" data-theme="default">Cyber</button>
               <button class="theme-btn" data-theme="theme-light">Light</button>
@@ -75,30 +65,47 @@
               <button class="theme-btn" data-theme="theme-matrix">Matrix</button>
             </div>
           </div>
-        </div>
 
-        <div id="view-mode" class="settings-view hidden">
-          <button class="back-btn" title="Zurück">⬅</button>
-          <button class="close-btn close-all-btn" title="Schließen">✖</button>
-          <h2>Modus & Dauer</h2>
-          <div class="settings-layout">
-            <div class="setting-section">
-              <h3>Modus</h3>
-              <div class="setting-group" id="mode-select">
-                <button class="mode-btn active" data-mode="time">Zeit</button>
-                <button class="mode-btn" data-mode="words">Wörter</button>
-              </div>
-            </div>
-            <div class="setting-section">
-              <h3>Dauer / Anzahl</h3>
-              <div class="setting-group" id="value-select">
-                <button class="val-btn active" data-val="5">5</button>
-                <button class="val-btn" data-val="10">10</button>
-                <button class="val-btn" data-val="20">20</button>
-                <button class="val-btn" data-val="30">30</button>
-              </div>
+          <div class="setting-section">
+            <h3>🔥 Schwierigkeit</h3>
+            <div class="setting-group" id="diff-select">
+              <button class="diff-btn" data-diff="normal">Normal (Leicht)</button>
+              <button class="diff-btn active" data-diff="hard">Hard (Sätze)</button>
             </div>
           </div>
+
+          <div class="setting-section">
+            <h3>🔊 Sound</h3>
+            <div class="setting-group" id="sound-select">
+              <button class="sound-btn" data-sound="off">Aus</button>
+              <button class="sound-btn active" data-sound="on">An</button>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <h3>⏱️ Modus</h3>
+            <div class="setting-group" id="mode-select">
+              <button class="mode-btn active" data-mode="time">Zeit</button>
+              <button class="mode-btn" data-mode="words">Wörter</button>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <h3>📏 Dauer / Anzahl</h3>
+            <div class="setting-group" id="value-select">
+              <button class="val-btn active" data-val="5">5</button>
+              <button class="val-btn" data-val="10">10</button>
+              <button class="val-btn" data-val="20">20</button>
+              <button class="val-btn" data-val="30">30</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="local-history-section">
+          <h3>🏆 Letzte Ergebnisse</h3>
+          <ul id="history-list" class="history-list">
+            <li>Noch keine Spiele absolviert.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -113,16 +120,19 @@
             <div class="stat-label">WPM</div>
             <div id="final-wpm" class="stat-value wpm-color">0</div>
           </div>
-
           <div class="stat-box">
             <div class="stat-label">Genauigkeit</div>
             <div id="final-acc" class="stat-value">100%</div>
           </div>
-
           <div class="stat-box">
             <div class="stat-label">Fehler</div>
             <div id="final-errors" class="stat-value error-color">0</div>
           </div>
+        </div>
+
+        <div class="wpm-chart-container">
+          <h3 class="chart-title">WPM Verlauf</h3>
+          <div id="wpm-chart" class="wpm-chart"></div>
         </div>
 
         <button id="modal-restart-btn" class="btn-primary mt-4">

@@ -1,18 +1,17 @@
 import { calculateWpm } from './logic.js';
 
-// NEU: Datenbank mit Sätzen in 3 Sprachen
 const sentencesData = {
   de: [
-    'Programmieren ist die Kunst, Algorithmen in ausfuehrbaren Code zu verwandeln.',
+    'Programmieren ist die Kunst, Algorithmen in ausführbaren Code zu verwandeln.',
     'Ein guter Entwickler liest deutlich mehr Code, als er selbst schreibt.',
     'Jeder Fehler ist eine neue Gelegenheit, etwas Wichtiges zu lernen.',
     'Technologie entwickelt sich rasant, aber die Grundlagen bleiben gleich.',
-    'Wer aufhoert, besser werden zu wollen, hat aufgehoert, gut zu sein.',
-    'Ein sauberer Code ist wie ein Buch, er erklaert sich von selbst.',
-    'Das Internet hat die Art und Weise, wie wir kommunizieren, veraendert.',
+    'Wer aufhört, besser werden zu wollen, hat aufgehört, gut zu sein.',
+    'Ein sauberer Code ist wie ein Buch, er erklärt sich von selbst.',
+    'Das Internet hat die Art und Weise, wie wir kommunizieren, verändert.',
     'Schnelles Tippen spart dir auf Dauer sehr viel Zeit am Computer.',
     'Es ist besser, eine Aufgabe richtig zu machen, als sie zweimal zu tun.',
-    'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
+    'Künstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
   ],
   en: [
     'Programming is the art of turning algorithms into executable code.',
@@ -27,32 +26,41 @@ const sentencesData = {
     'Artificial intelligence will help us work even more creatively.',
   ],
   es: [
-    'Programar es el arte de convertir algoritmos en codigo ejecutable.',
-    'Un buen desarrollador lee mucho mas codigo del que escribe.',
+    'Programar es el arte de convertir algoritmos en código ejecutable.',
+    'Un buen desarrollador lee mucho más código del que escribe.',
     'Cada error es una nueva oportunidad para aprender algo importante.',
-    'La tecnologia evoluciona rapidamente, pero los fundamentos son los mismos.',
+    'La tecnología evoluciona rápidamente, pero los fundamentos son los mismos.',
     'Quien deja de mejorar, ha dejado de ser bueno.',
-    'El codigo limpio es como un libro, se explica por si mismo.',
+    'El código limpio es como un libro, se explica por sí mismo.',
     'Internet ha cambiado la forma en que nos comunicamos.',
-    'Escribir rapido te ahorra mucho tiempo en la computadora.',
+    'Escribir rápido te ahorra mucho tiempo en la computadora.',
     'Es mejor hacer una tarea bien que hacerla dos veces.',
-    'La inteligencia artificial nos ayudara a ser mas creativos.',
+    'La inteligencia artificial nos ayudará a ser más creativos.',
   ],
 };
 
 const typingArea = document.getElementById('typing-area');
 const statusLine = document.getElementById('status-line');
 const restartBtn = document.getElementById('restart-btn');
-const modeBtns = document.querySelectorAll('.mode-btn');
-const valBtns = document.querySelectorAll('.val-btn');
-const themeBtns = document.querySelectorAll('.theme-btn');
-const langBtns = document.querySelectorAll('.lang-btn'); // NEU
 const progressBar = document.getElementById('progress-bar');
+const startHint = document.getElementById('start-hint');
+const wpmChart = document.getElementById('wpm-chart');
+const historyList = document.getElementById('history-list');
 
+// Settings Elements
 const settingsBtn = document.getElementById('settings-btn');
 const settingsModal = document.getElementById('settings-modal');
 const closeSettingsModalBtn = document.getElementById('close-settings-modal');
 
+// Buttons Arrays
+const langBtns = document.querySelectorAll('.lang-btn');
+const themeBtns = document.querySelectorAll('.theme-btn');
+const diffBtns = document.querySelectorAll('.diff-btn');
+const soundBtns = document.querySelectorAll('.sound-btn');
+const modeBtns = document.querySelectorAll('.mode-btn');
+const valBtns = document.querySelectorAll('.val-btn');
+
+// Result Elements
 const resultModal = document.getElementById('result-modal');
 const closeModalBtn = document.getElementById('close-modal');
 const modalRestartBtn = document.getElementById('modal-restart-btn');
@@ -60,9 +68,14 @@ const finalWpmDisplay = document.getElementById('final-wpm');
 const finalAccDisplay = document.getElementById('final-acc');
 const finalErrorsDisplay = document.getElementById('final-errors');
 
-let currentLang = 'de'; // Standardsprache
+// Game State
+let currentLang = 'de';
+let currentTheme = 'default';
+let currentDiff = 'hard'; // 'normal' = kleinbuchstaben, keine satzzeichen
+let soundEnabled = true;
 let currentMode = 'time';
 let currentValue = 5;
+
 let timerInterval = null;
 let isStarted = false;
 let isGameOver = false;
@@ -72,25 +85,81 @@ let startTime = null;
 
 let totalKeystrokes = 0;
 let errorsCount = 0;
+let wpmHistory = [];
+
+// Audio Setup (Web Audio API)
+let audioCtx;
+function playTypingSound(isError) {
+  if (!soundEnabled) return;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const osc = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  osc.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  if (isError) {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  } else {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+  }
+}
+
+// Local Storage History
+function loadHistory() {
+  const history = JSON.parse(localStorage.getItem('speedTyperHistory')) || [];
+  historyList.innerHTML = '';
+  if (history.length === 0) {
+    historyList.innerHTML = '<li>Noch keine Spiele absolviert.</li>';
+    return;
+  }
+  history.forEach((item) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span>📅 ${item.date}</span> <span>⚡ ${item.wpm} WPM | 🎯 ${item.acc}%</span>`;
+    historyList.appendChild(li);
+  });
+}
+
+function saveToHistory(wpm, acc) {
+  const history = JSON.parse(localStorage.getItem('speedTyperHistory')) || [];
+  const date = new Date().toLocaleDateString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  history.unshift({ wpm, acc, date });
+  if (history.length > 5) history.pop();
+  localStorage.setItem('speedTyperHistory', JSON.stringify(history));
+  loadHistory();
+}
 
 function generateTextArray() {
-  // Wählt den richtigen Pool basierend auf der aktuellen Sprache
   const pool = sentencesData[currentLang];
   let shuffled = [...pool].sort(() => 0.5 - Math.random());
-
   while (shuffled.length < 15) {
     shuffled = shuffled.concat([...pool].sort(() => 0.5 - Math.random()));
   }
 
-  const fullText = shuffled.join(' ');
-  let wordsArray = fullText.split(' ');
+  let fullText = shuffled.join(' ');
 
+  // Normal Mode: Alles klein, keine Satzzeichen
+  if (currentDiff === 'normal') {
+    fullText = fullText.toLowerCase().replace(/[.,;:!?]/g, '');
+  }
+
+  let wordsArray = fullText.split(' ');
   if (currentMode === 'words') {
     wordsArray = wordsArray.slice(0, currentValue);
   } else {
     wordsArray = wordsArray.slice(0, 150);
   }
-
   return wordsArray;
 }
 
@@ -100,12 +169,14 @@ function initGame() {
   currentIndex = 0;
   totalKeystrokes = 0;
   errorsCount = 0;
+  wpmHistory = [];
   isStarted = false;
   isGameOver = false;
+
+  startHint.classList.remove('hidden');
   resultModal.classList.add('hidden');
   clearInterval(timerInterval);
   statusLine.innerText = currentMode === 'time' ? currentValue : `${currentValue} W.`;
-
   progressBar.style.width = currentMode === 'time' ? '100%' : '0%';
   progressBar.classList.remove('danger');
 
@@ -130,93 +201,47 @@ function initGame() {
       wordDiv.appendChild(spaceSpan);
       charElements.push(spaceSpan);
     }
-
     typingArea.appendChild(wordDiv);
   });
 
-  if (charElements.length > 0) {
-    charElements[0].classList.add('active');
-  }
+  if (charElements.length > 0) charElements[0].classList.add('active');
 }
 
-// Settings & Sub-Menu Logik
-const settingsViews = document.querySelectorAll('.settings-view');
-const navBtns = document.querySelectorAll('.settings-nav-btn');
-const backBtns = document.querySelectorAll('.back-btn');
-const closeAllBtns = document.querySelectorAll('.close-all-btn');
-
-settingsBtn.addEventListener('click', () => {
-  settingsModal.classList.remove('hidden');
-});
-
-// Wechsle ins Untermenü
-navBtns.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    settingsViews.forEach((v) => v.classList.add('hidden'));
-    document.getElementById(btn.dataset.target).classList.remove('hidden');
+// Event Listeners for Settings
+function setupToggleButtons(nodeList, updateVarFn) {
+  nodeList.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      nodeList.forEach((b) => b.classList.remove('active'));
+      e.target.classList.add('active');
+      updateVarFn(e.target);
+      initGame();
+    });
   });
-});
+}
 
-// Zurück ins Hauptmenü
-backBtns.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    settingsViews.forEach((v) => v.classList.add('hidden'));
-    document.getElementById('view-main').classList.remove('hidden');
-  });
-});
-
-// Alles schließen & auf Hauptmenü zurücksetzen (über das X)
-closeAllBtns.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    settingsModal.classList.add('hidden');
-    setTimeout(() => {
-      settingsViews.forEach((v) => v.classList.add('hidden'));
-      document.getElementById('view-main').classList.remove('hidden');
-    }, 300); // Wartet kurz, bis die CSS-Animation unsichtbar ist
-  });
-});
-
-// NEU: Event-Listener für die Sprachen
-langBtns.forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    langBtns.forEach((b) => b.classList.remove('active'));
-    e.target.classList.add('active');
-    currentLang = e.target.dataset.lang;
-    initGame();
-  });
-});
+setupToggleButtons(langBtns, (t) => (currentLang = t.dataset.lang));
+setupToggleButtons(diffBtns, (t) => (currentDiff = t.dataset.diff));
+setupToggleButtons(soundBtns, (t) => (soundEnabled = t.dataset.sound === 'on'));
+setupToggleButtons(modeBtns, (t) => (currentMode = t.dataset.mode));
+setupToggleButtons(valBtns, (t) => (currentValue = parseInt(t.dataset.val, 10)));
 
 themeBtns.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     themeBtns.forEach((b) => b.classList.remove('active'));
     e.target.classList.add('active');
-
-    const selectedTheme = e.target.dataset.theme;
     document.body.className = '';
-    if (selectedTheme !== 'default') {
-      document.body.classList.add(selectedTheme);
-    }
+    const selectedTheme = e.target.dataset.theme;
+    if (selectedTheme !== 'default') document.body.classList.add(selectedTheme);
   });
 });
 
-modeBtns.forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    modeBtns.forEach((b) => b.classList.remove('active'));
-    e.target.classList.add('active');
-    currentMode = e.target.dataset.mode;
-    initGame();
-  });
+settingsBtn.addEventListener('click', () => {
+  loadHistory();
+  settingsModal.classList.remove('hidden');
 });
+closeSettingsModalBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
 
-valBtns.forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    valBtns.forEach((b) => b.classList.remove('active'));
-    e.target.classList.add('active');
-    currentValue = parseInt(e.target.dataset.val, 10);
-    initGame();
-  });
-});
-
+// Keyboard Logic
 document.addEventListener('keydown', (e) => {
   if (!settingsModal.classList.contains('hidden') || isGameOver) return;
 
@@ -230,6 +255,7 @@ document.addEventListener('keydown', (e) => {
 
   if (!isStarted) {
     isStarted = true;
+    startHint.classList.add('hidden');
     startTime = Date.now();
     startTimer();
   }
@@ -240,6 +266,7 @@ document.addEventListener('keydown', (e) => {
     charElements[currentIndex].classList.remove('correct', 'incorrect');
     charElements[currentIndex].classList.add('active');
     charElements[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    playTypingSound(false);
     return;
   }
 
@@ -249,9 +276,11 @@ document.addEventListener('keydown', (e) => {
 
     if (e.key === currentSpan.innerText) {
       currentSpan.classList.add('correct');
+      playTypingSound(false);
     } else {
       currentSpan.classList.add('incorrect');
       errorsCount++;
+      playTypingSound(true);
     }
 
     currentSpan.classList.remove('active');
@@ -260,7 +289,6 @@ document.addEventListener('keydown', (e) => {
     if (currentMode === 'words') {
       const percentage = (currentIndex / charElements.length) * 100;
       progressBar.style.width = `${percentage}%`;
-      progressBar.style.transition = 'width 0.1s linear';
     }
 
     if (currentIndex < charElements.length) {
@@ -274,20 +302,40 @@ document.addEventListener('keydown', (e) => {
 
 function startTimer() {
   timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    if (currentMode === 'time') {
-      const left = currentValue - elapsed;
-      statusLine.innerText = left;
+    const elapsedSecs = Math.floor((Date.now() - startTime) / 1000);
+    const elapsedMins = elapsedSecs / 60;
 
+    // WPM Tracking for Chart
+    const totalCorrect = document.querySelectorAll('.char.correct').length;
+    const currentWpm = elapsedMins > 0 ? calculateWpm(totalCorrect, elapsedMins) : 0;
+    wpmHistory.push(currentWpm);
+
+    if (currentMode === 'time') {
+      const left = currentValue - elapsedSecs;
+      statusLine.innerText = left;
       const percentage = (left / currentValue) * 100;
       progressBar.style.width = `${percentage}%`;
       if (left <= 3) progressBar.classList.add('danger');
-
       if (left <= 0) endGame();
     } else {
-      statusLine.innerText = `${elapsed}s`;
+      statusLine.innerText = `${elapsedSecs}s`;
     }
   }, 1000);
+}
+
+function renderChart() {
+  wpmChart.innerHTML = '';
+  if (wpmHistory.length === 0) return;
+  const maxWpm = Math.max(...wpmHistory, 10); // Verhindert div/0
+
+  wpmHistory.forEach((wpm) => {
+    const bar = document.createElement('div');
+    bar.className = 'chart-bar';
+    const heightPercent = (wpm / maxWpm) * 100;
+    bar.style.height = `${heightPercent}%`;
+    bar.setAttribute('data-wpm', wpm);
+    wpmChart.appendChild(bar);
+  });
 }
 
 function endGame() {
@@ -297,12 +345,9 @@ function endGame() {
 
   const totalCorrect = document.querySelectorAll('.char.correct').length;
   let elapsedMinutes = (Date.now() - startTime) / 60000;
-  if (elapsedMinutes <= 0) {
-    elapsedMinutes = currentValue / 60;
-  }
+  if (elapsedMinutes <= 0) elapsedMinutes = currentValue / 60;
 
   const wpm = calculateWpm(totalCorrect, elapsedMinutes);
-
   let accuracy = 100;
   if (totalKeystrokes > 0) {
     accuracy = Math.max(0, Math.round(((totalKeystrokes - errorsCount) / totalKeystrokes) * 100));
@@ -312,6 +357,9 @@ function endGame() {
   finalAccDisplay.innerText = `${accuracy}%`;
   finalErrorsDisplay.innerText = errorsCount;
 
+  renderChart();
+  saveToHistory(wpm, accuracy);
+
   resultModal.classList.remove('hidden');
 }
 
@@ -319,4 +367,5 @@ restartBtn.addEventListener('click', initGame);
 closeModalBtn.addEventListener('click', initGame);
 modalRestartBtn.addEventListener('click', initGame);
 
+loadHistory();
 initGame();
