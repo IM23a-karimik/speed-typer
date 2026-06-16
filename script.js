@@ -139,13 +139,41 @@ function initGame() {
   }
 }
 
-// Settings & Modal Logik
+// Settings & Sub-Menu Logik
+const settingsViews = document.querySelectorAll('.settings-view');
+const navBtns = document.querySelectorAll('.settings-nav-btn');
+const backBtns = document.querySelectorAll('.back-btn');
+const closeAllBtns = document.querySelectorAll('.close-all-btn');
+
 settingsBtn.addEventListener('click', () => {
   settingsModal.classList.remove('hidden');
 });
 
-closeSettingsModalBtn.addEventListener('click', () => {
-  settingsModal.classList.add('hidden');
+// Wechsle ins Untermenü
+navBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    settingsViews.forEach((v) => v.classList.add('hidden'));
+    document.getElementById(btn.dataset.target).classList.remove('hidden');
+  });
+});
+
+// Zurück ins Hauptmenü
+backBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    settingsViews.forEach((v) => v.classList.add('hidden'));
+    document.getElementById('view-main').classList.remove('hidden');
+  });
+});
+
+// Alles schließen & auf Hauptmenü zurücksetzen (über das X)
+closeAllBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    settingsModal.classList.add('hidden');
+    setTimeout(() => {
+      settingsViews.forEach((v) => v.classList.add('hidden'));
+      document.getElementById('view-main').classList.remove('hidden');
+    }, 300); // Wartet kurz, bis die CSS-Animation unsichtbar ist
+  });
 });
 
 // NEU: Event-Listener für die Sprachen

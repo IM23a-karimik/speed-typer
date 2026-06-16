@@ -40,21 +40,34 @@
 
     <div id="settings-modal" class="modal hidden">
       <div class="modal-content settings-content">
-        <button id="close-settings-modal" class="close-btn" title="Schließen">✖</button>
-        <h2>Einstellungen</h2>
+        <div id="view-main" class="settings-view">
+          <button class="close-btn close-all-btn" title="Schließen">✖</button>
+          <h2>Einstellungen</h2>
+          <div class="settings-layout">
+            <button class="settings-nav-btn" data-target="view-lang">🌍 Spracheinstellungen</button>
+            <button class="settings-nav-btn" data-target="view-theme">🎨 Farbschema ändern</button>
+            <button class="settings-nav-btn" data-target="view-mode">⏱️ Modus & Dauer</button>
+          </div>
+        </div>
 
-        <div class="settings-layout">
-          <div class="setting-section">
-            <h3>Sprache</h3>
+        <div id="view-lang" class="settings-view hidden">
+          <button class="back-btn" title="Zurück">⬅</button>
+          <button class="close-btn close-all-btn" title="Schließen">✖</button>
+          <h2>Sprache</h2>
+          <div class="settings-layout">
             <div class="setting-group" id="lang-select">
               <button class="lang-btn active" data-lang="de">Deutsch</button>
               <button class="lang-btn" data-lang="en">English</button>
               <button class="lang-btn" data-lang="es">Español</button>
             </div>
           </div>
+        </div>
 
-          <div class="setting-section">
-            <h3>Farbschema</h3>
+        <div id="view-theme" class="settings-view hidden">
+          <button class="back-btn" title="Zurück">⬅</button>
+          <button class="close-btn close-all-btn" title="Schließen">✖</button>
+          <h2>Farbschema</h2>
+          <div class="settings-layout">
             <div class="setting-group" id="theme-select">
               <button class="theme-btn active" data-theme="default">Cyber</button>
               <button class="theme-btn" data-theme="theme-light">Light</button>
@@ -62,22 +75,28 @@
               <button class="theme-btn" data-theme="theme-matrix">Matrix</button>
             </div>
           </div>
+        </div>
 
-          <div class="setting-section">
-            <h3>Modus</h3>
-            <div class="setting-group" id="mode-select">
-              <button class="mode-btn active" data-mode="time">Zeit</button>
-              <button class="mode-btn" data-mode="words">Wörter</button>
+        <div id="view-mode" class="settings-view hidden">
+          <button class="back-btn" title="Zurück">⬅</button>
+          <button class="close-btn close-all-btn" title="Schließen">✖</button>
+          <h2>Modus & Dauer</h2>
+          <div class="settings-layout">
+            <div class="setting-section">
+              <h3>Modus</h3>
+              <div class="setting-group" id="mode-select">
+                <button class="mode-btn active" data-mode="time">Zeit</button>
+                <button class="mode-btn" data-mode="words">Wörter</button>
+              </div>
             </div>
-          </div>
-
-          <div class="setting-section">
-            <h3>Dauer / Anzahl</h3>
-            <div class="setting-group" id="value-select">
-              <button class="val-btn active" data-val="5">5</button>
-              <button class="val-btn" data-val="10">10</button>
-              <button class="val-btn" data-val="20">20</button>
-              <button class="val-btn" data-val="30">30</button>
+            <div class="setting-section">
+              <h3>Dauer / Anzahl</h3>
+              <div class="setting-group" id="value-select">
+                <button class="val-btn active" data-val="5">5</button>
+                <button class="val-btn" data-val="10">10</button>
+                <button class="val-btn" data-val="20">20</button>
+                <button class="val-btn" data-val="30">30</button>
+              </div>
             </div>
           </div>
         </div>
