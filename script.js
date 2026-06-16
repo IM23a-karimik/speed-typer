@@ -37,7 +37,7 @@ const sentencesData = {
     'Escribir rapido te ahorra mucho tiempo en la computadora.',
     'Es mejor hacer una tarea bien que hacerla dos veces.',
     'La inteligencia artificial nos ayudara a ser mas creativos.',
-  ]
+  ],
 };
 
 const typingArea = document.getElementById('typing-area');
