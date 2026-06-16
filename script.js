@@ -1,17 +1,44 @@
 import { calculateWpm } from './logic.js';
 
-const sentencesPool = [
-  'Programmieren ist die Kunst, Algorithmen in ausfuehrbaren Code zu verwandeln.',
-  'Ein guter Entwickler liest deutlich mehr Code, als er selbst schreibt.',
-  'Jeder Fehler ist eine neue Gelegenheit, etwas Wichtiges zu lernen.',
-  'Technologie entwickelt sich rasant, aber die Grundlagen bleiben gleich.',
-  'Wer aufhoert, besser werden zu wollen, hat aufgehoert, gut zu sein.',
-  'Ein sauberer Code ist wie ein Buch, er erklaert sich von selbst.',
-  'Das Internet hat die Art und Weise, wie wir kommunizieren, veraendert.',
-  'Schnelles Tippen spart dir auf Dauer sehr viel Zeit am Computer.',
-  'Es ist besser, eine Aufgabe richtig zu machen, als sie zweimal zu tun.',
-  'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
-];
+// NEU: Datenbank mit Sätzen in 3 Sprachen
+const sentencesData = {
+  de: [
+    'Programmieren ist die Kunst, Algorithmen in ausfuehrbaren Code zu verwandeln.',
+    'Ein guter Entwickler liest deutlich mehr Code, als er selbst schreibt.',
+    'Jeder Fehler ist eine neue Gelegenheit, etwas Wichtiges zu lernen.',
+    'Technologie entwickelt sich rasant, aber die Grundlagen bleiben gleich.',
+    'Wer aufhoert, besser werden zu wollen, hat aufgehoert, gut zu sein.',
+    'Ein sauberer Code ist wie ein Buch, er erklaert sich von selbst.',
+    'Das Internet hat die Art und Weise, wie wir kommunizieren, veraendert.',
+    'Schnelles Tippen spart dir auf Dauer sehr viel Zeit am Computer.',
+    'Es ist besser, eine Aufgabe richtig zu machen, als sie zweimal zu tun.',
+    'Kuenstliche Intelligenz wird uns helfen, noch kreativer zu arbeiten.',
+  ],
+  en: [
+    'Programming is the art of turning algorithms into executable code.',
+    'A good developer reads significantly more code than they write.',
+    'Every mistake is a new opportunity to learn something important.',
+    'Technology evolves rapidly, but the fundamentals remain the same.',
+    'He who stops wanting to become better has stopped being good.',
+    'Clean code is like a book, it explains itself.',
+    'The internet has changed the way we communicate.',
+    'Fast typing saves you a lot of time on the computer.',
+    'It is better to do a task right than to do it twice.',
+    'Artificial intelligence will help us work even more creatively.',
+  ],
+  es: [
+    'Programar es el arte de convertir algoritmos en codigo ejecutable.',
+    'Un buen desarrollador lee mucho mas codigo del que escribe.',
+    'Cada error es una nueva oportunidad para aprender algo importante.',
+    'La tecnologia evoluciona rapidamente, pero los fundamentos son los mismos.',
+    'Quien deja de mejorar, ha dejado de ser bueno.',
+    'El codigo limpio es como un libro, se explica por si mismo.',
+    'Internet ha cambiado la forma en que nos comunicamos.',
+    'Escribir rapido te ahorra mucho tiempo en la computadora.',
+    'Es mejor hacer una tarea bien que hacerla dos veces.',
+    'La inteligencia artificial nos ayudara a ser mas creativos.',
+  ]
+};
 
 const typingArea = document.getElementById('typing-area');
 const statusLine = document.getElementById('status-line');
@@ -19,6 +46,7 @@ const restartBtn = document.getElementById('restart-btn');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const valBtns = document.querySelectorAll('.val-btn');
 const themeBtns = document.querySelectorAll('.theme-btn');
+const langBtns = document.querySelectorAll('.lang-btn'); // NEU
 const progressBar = document.getElementById('progress-bar');
 
 const settingsBtn = document.getElementById('settings-btn');
@@ -32,6 +60,7 @@ const finalWpmDisplay = document.getElementById('final-wpm');
 const finalAccDisplay = document.getElementById('final-acc');
 const finalErrorsDisplay = document.getElementById('final-errors');
 
+let currentLang = 'de'; // Standardsprache
 let currentMode = 'time';
 let currentValue = 5;
 let timerInterval = null;
@@ -45,10 +74,12 @@ let totalKeystrokes = 0;
 let errorsCount = 0;
 
 function generateTextArray() {
-  let shuffled = [...sentencesPool].sort(() => 0.5 - Math.random());
+  // Wählt den richtigen Pool basierend auf der aktuellen Sprache
+  const pool = sentencesData[currentLang];
+  let shuffled = [...pool].sort(() => 0.5 - Math.random());
 
   while (shuffled.length < 15) {
-    shuffled = shuffled.concat([...sentencesPool].sort(() => 0.5 - Math.random()));
+    shuffled = shuffled.concat([...pool].sort(() => 0.5 - Math.random()));
   }
 
   const fullText = shuffled.join(' ');
@@ -108,7 +139,7 @@ function initGame() {
   }
 }
 
-// Settings & Theme Logik
+// Settings & Modal Logik
 settingsBtn.addEventListener('click', () => {
   settingsModal.classList.remove('hidden');
 });
@@ -117,13 +148,23 @@ closeSettingsModalBtn.addEventListener('click', () => {
   settingsModal.classList.add('hidden');
 });
 
+// NEU: Event-Listener für die Sprachen
+langBtns.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    langBtns.forEach((b) => b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentLang = e.target.dataset.lang;
+    initGame();
+  });
+});
+
 themeBtns.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     themeBtns.forEach((b) => b.classList.remove('active'));
     e.target.classList.add('active');
 
     const selectedTheme = e.target.dataset.theme;
-    document.body.className = ''; // Setzt alle Klassen zurück
+    document.body.className = '';
     if (selectedTheme !== 'default') {
       document.body.classList.add(selectedTheme);
     }
